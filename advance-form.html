@@ -6,7 +6,7 @@
         <h1>Advance Form Fields</h1>
 
 
-        <form action="">
+        <form action="" method="GET">
 
             <!-- input type text -->
             <label for="full-name">Full Name</label>
@@ -68,7 +68,7 @@
                 <br>
                 
                 <label for="province">Select your province</label>
-                <select name="province" id="province">
+                <select name="province" id="province" multiple >
                     <option value="koshi">Koshi Province</option>
                     <option value="madesh">Madesh Province</option>
                     <option value="bagmati">Bagmati Province</option>
@@ -77,6 +77,13 @@
                     <option value="karnali">Karnali Province</option>
                     <option value="sudurpaschim">Sudurpaschim Province</option>
                 </select>
+                <br>
+                <br>
+
+                <input type="checkbox" name="fruits" id="apple">
+                <label for="apple">Apple</label>
+                <input type="checkbox" name="fruits" id="orange">
+                <label for="orange">Orange</label>
 
                 <br><br><br><br><br><br><br>
 
