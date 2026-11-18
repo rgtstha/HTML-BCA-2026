@@ -1,0 +1,5 @@
+# macOS folder files
+.DS_Store
+
+# Quiz files (answers stay off GitHub)
+*Quiz*.xlsx

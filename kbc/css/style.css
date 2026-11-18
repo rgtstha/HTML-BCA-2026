@@ -1,0 +1,19 @@
+h1 {
+    color: blue;
+}
+
+
+h2 {
+    color: red;
+}
+
+
+#second-p {
+    color: brown;
+}
+
+.orange-p {
+    color: yellowgreen;
+    font-size: 14px;
+    font-style: italic;
+}
