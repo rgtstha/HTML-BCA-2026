@@ -1,0 +1,3500 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Box Model → Build Your Portfolio</title>
+<style>
+/* =========================================================
+   Theme tokens
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#f8f5ef;--surface:#ffffff;--surface-2:#f1ece3;--fg:#1c1a27;--muted:#5f5b70;--line:#e3dccf;
+  --html:#d9480f;--html-soft:#ffefe5;--html-ink:#b03a0a;
+  --css:#1d4ed8;--css-soft:#e8eeff;--css-ink:#1a43b5;
+  --ok:#1a7f37;--ok-soft:#e2f4e7;--bad:#c62828;--bad-soft:#fdecec;--mark:#ffe58a;
+  --accent:var(--html);--accent-soft:var(--html-soft);--accent-ink:var(--html-ink);
+  --code-bg:#1e1d2b;--code-fg:#e9e7f3;--code-dim:#8e8ba6;--code-edge:#2d2b40;--code-tab:#17161f;
+  --sans:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Roboto,Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Cascadia Mono","Liberation Mono",monospace;
+  --shadow:0 1px 2px rgba(40,30,10,.05),0 8px 24px rgba(40,30,10,.07);
+}
+html[data-theme="dark"]{
+  --bg:#15141c;--surface:#1f1d29;--surface-2:#292735;--fg:#f3f1eb;--muted:#aaa6ba;--line:#363241;
+  --html:#ff8a4c;--html-soft:#3b2418;--html-ink:#ffb48c;
+  --css:#7aa7ff;--css-soft:#1a2442;--css-ink:#a9c6ff;
+  --ok:#5ad27f;--ok-soft:#163222;--bad:#ff7b7b;--bad-soft:#3b1c20;--mark:#6b5512;
+  --code-bg:#100f17;--code-edge:#2a283a;--code-tab:#0b0a10;--shadow:none;
+}
+.slide[data-part="css"]{--accent:var(--css);--accent-soft:var(--css-soft);--accent-ink:var(--css-ink)}
+
+/* =========================================================
+   Stage + slides (fixed 1280x720, scaled to fit the screen)
+   ========================================================= */
+html,body{margin:0;height:100%;overflow:hidden;background:#0a0910}
+body{font-family:var(--sans);-webkit-font-smoothing:antialiased}
+body:not(.mouse){cursor:none}
+#stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0}
+.slide{position:absolute;left:0;top:0;width:1280px;height:720px;padding:44px 64px 68px;background:var(--bg);color:var(--fg);
+  display:flex;flex-direction:column;overflow:hidden;font-size:26px;line-height:1.4;
+  opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s}
+.slide.active{opacity:1;visibility:visible;transition:opacity .3s ease}
+.kicker{margin:0 0 4px;font-size:15px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.slide h2{margin:0 0 20px;font-size:42px;line-height:1.12;font-weight:800;letter-spacing:-.015em}
+.slide h3{margin:0 0 8px;font-size:24px;line-height:1.2}
+.slide p{margin:0}
+.body{flex:1;min-height:0;display:flex;flex-direction:column;gap:16px}
+.slide code{font-family:var(--mono);font-size:.84em;background:var(--accent-soft);color:var(--accent-ink);padding:.06em .32em;border-radius:6px;white-space:nowrap}
+.accent{color:var(--accent)}
+.muted{color:var(--muted)}
+.small{font-size:21px}.xs{font-size:17px}.lead{font-size:29px;line-height:1.35}
+kbd{font-family:var(--mono);font-size:.8em;padding:.08em .45em;border-radius:6px;border:1px solid var(--line);border-bottom-width:3px;background:var(--surface);color:var(--fg)}
+.row{display:flex;gap:22px;min-height:0}
+.grow{flex:1;min-width:0;min-height:0}
+.fill{flex:1;min-height:0}
+.col{display:flex;flex-direction:column;gap:14px;min-height:0;min-width:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 22px;box-shadow:var(--shadow)}
+.card.tight{padding:14px 18px}
+.tip{background:var(--accent-soft);border-left:5px solid var(--accent);border-radius:4px 14px 14px 4px;padding:11px 18px;font-size:21px;line-height:1.4}
+.tip.good{--accent:var(--ok);--accent-soft:var(--ok-soft);--accent-ink:var(--ok)}
+.tip.bad{--accent:var(--bad);--accent-soft:var(--bad-soft);--accent-ink:var(--bad)}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);font-weight:700;font-size:18px}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip{padding:6px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:19px}
+ul.list,ol.list{margin:0;padding-left:1.15em}
+.list li{margin:6px 0}
+ol.steps{list-style:none;counter-reset:st;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+ol.steps>li{counter-increment:st;display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start}
+ol.steps>li::before{content:counter(st);width:40px;height:40px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px;margin-top:-2px}
+ul.ticks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+ul.ticks li{padding-left:36px;position:relative}
+ul.ticks li::before{content:"✓";position:absolute;left:4px;top:0;color:var(--ok);font-weight:900}
+
+/* ---------- footer ---------- */
+.foot{position:absolute;left:64px;right:64px;bottom:20px;display:flex;justify-content:space-between;font-size:14px;font-weight:600;color:var(--muted);letter-spacing:.05em}
+.foot .bar{position:absolute;left:-64px;right:-64px;bottom:-20px;height:5px;background:var(--line)}
+.foot .bar i{display:block;height:100%;background:var(--accent)}
+
+/* ---------- fragments (step-by-step reveals) ---------- */
+.frag:not(.keep){opacity:0;transform:translateY(10px);transition:opacity .35s ease,transform .35s ease}
+.frag.shown:not(.keep){opacity:1;transform:none}
+
+/* =========================================================
+   Code blocks + syntax colours (VS Code Dark+ style)
+   ========================================================= */
+.cb{background:var(--code-bg);color:var(--code-fg);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;border:1px solid var(--code-edge);min-width:0;min-height:0}
+.cb-tab{display:flex;align-items:center;gap:10px;padding:7px 14px;font:600 14px var(--sans);color:var(--code-dim);background:var(--code-tab);border-bottom:1px solid var(--code-edge);flex:none}
+.fi{font:800 12px var(--mono);padding:2px 6px;border-radius:5px;background:#e4572e;color:#fff}
+.fi.fi-css{background:#2965f1}
+.cb pre{margin:0;padding:12px 0;font-family:var(--mono);font-size:var(--fs,22px);line-height:1.5;overflow:auto}
+.cb code,.editor code{display:block;font:inherit;background:none;color:inherit;padding:0;border-radius:0;white-space:pre}
+.cb .line{display:block;padding:0 18px 0 14px;white-space:pre;border-left:4px solid transparent}
+.cb.ln pre{counter-reset:ln}
+.cb.ln .line::before{counter-increment:ln;content:counter(ln);display:inline-block;width:1.4em;margin-right:16px;text-align:right;color:#5d5a75}
+.cb .line.hl,.cb .line.hl-step.shown{background:rgba(255,209,102,.14);border-left-color:#ffd166}
+.cb .line.bug.shown{background:rgba(255,107,107,.18);border-left-color:#ff6b6b}
+.cb .line.bug,.cb .line.hl-step{transition:background .3s}
+.t-tag{color:#569cd6}.t-attr{color:#9cdcfe}.t-str{color:#ce9178}.t-com{color:#6a9955;font-style:italic}.t-pun{color:#8f8f9c}
+.t-sel{color:#d7ba7d}.t-prop{color:#9cdcfe}.t-val{color:#ce9178}.t-num{color:#b5cea8}.t-at{color:#c586c0}.t-fn{color:#dcdcaa}
+
+/* =========================================================
+   Live demos: editable code + real browser preview (iframe)
+   ========================================================= */
+.live{display:flex;flex-direction:column;min-height:0;min-width:0;flex:1}
+.live-grid{display:grid;gap:16px;flex:1;min-height:0}
+.live-code{display:flex;flex-direction:column;background:var(--code-bg);border-radius:14px;overflow:hidden;border:1px solid var(--code-edge);min-width:0;min-height:0}
+.ed-hint{font-weight:500;color:#6f6c88;font-size:12.5px}
+.mini{margin-left:auto;font:600 12.5px var(--sans);color:#cfcde0;background:#2b2a3b;border:1px solid #3a384e;border-radius:7px;padding:3px 10px;cursor:pointer}
+.mini:hover{background:#38364c}
+.editor{position:relative;flex:1;min-height:0}
+.editor pre,.editor textarea{position:absolute;inset:0;margin:0;padding:12px 16px;font-family:var(--mono);font-size:var(--fs,19px);line-height:1.5;
+  white-space:pre;tab-size:4;border:0;letter-spacing:0;font-variant-ligatures:none;word-wrap:normal;overflow-wrap:normal}
+.editor pre{overflow:hidden;color:var(--code-fg);pointer-events:none}
+.editor textarea{width:100%;height:100%;background:transparent;color:transparent;caret-color:#ffffff;resize:none;outline:none;overflow:auto;-webkit-text-fill-color:transparent}
+.editor textarea::selection{background:rgba(122,167,255,.35)}
+.editor textarea:focus{box-shadow:inset 0 0 0 2px rgba(122,167,255,.55)}
+.live-out{display:flex;flex-direction:column;background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);min-width:0;min-height:0}
+.bbar{display:flex;align-items:center;gap:10px;padding:7px 10px;background:#e9e9ef;border-bottom:1px solid #d6d6de;font:13px var(--sans);color:#333;flex:none}
+.bbar .dots{display:flex;gap:5px;flex:none}
+.bbar .dots i{width:11px;height:11px;border-radius:50%;background:#ff5f57}
+.bbar .dots i:nth-child(2){background:#febc2e}.bbar .dots i:nth-child(3){background:#28c840}
+.bbar .btab{flex:none;max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;background:#fff;padding:3px 12px;border-radius:7px 7px 0 0;box-shadow:0 -1px 0 #d6d6de}
+.bbar .url{flex:1;min-width:0;background:#fff;border-radius:6px;padding:3px 10px;color:#555;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:12.5px var(--mono)}
+.bbar .url.flash{animation:flash 1.2s ease}
+@keyframes flash{0%{background:#ffe066}100%{background:#fff}}
+.css-toggle{flex:none;font:800 12.5px var(--sans);border:0;border-radius:999px;padding:5px 12px;cursor:pointer;background:#8a8798;color:#fff}
+.css-toggle.on{background:#1d4ed8}
+.fwrap{position:relative;flex:1;min-height:0;overflow:hidden;background:#fff}
+.fwrap iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;background:#fff;display:block}
+
+/* address-bar output for the form submit demo */
+.addr{display:flex;align-items:center;gap:14px;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px 18px;min-height:64px}
+.addr .lab{font:800 13px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex:none}
+.addr-text{font:21px/1.4 var(--mono);word-break:break-all;flex:1}
+.addr-text.flash{animation:flash2 1.4s ease}
+@keyframes flash2{0%{background:var(--mark)}100%{background:transparent}}
+.u-act{color:var(--fg);font-weight:700}.u-q,.u-amp,.u-eq{color:var(--muted)}
+.u-k{color:var(--css-ink);font-weight:700}.u-v{color:var(--ok)}
+.u-v.secret{color:#fff;background:var(--bad);padding:0 6px;border-radius:5px}
+.u-note{color:var(--muted);font-family:var(--sans);font-size:18px}
+
+/* =========================================================
+   Anatomy diagrams (labelled brackets)
+   ========================================================= */
+.anat{background:var(--code-bg);border-radius:18px;padding:66px 24px 98px;display:flex;justify-content:center;font:31px/1.2 var(--mono);color:var(--code-fg);white-space:pre;border:1px solid var(--code-edge)}
+.seg{position:relative;display:inline-block;--off:0px}
+.seg::before{content:"";position:absolute;left:3px;right:3px;height:12px;border:2.5px solid var(--c)}
+.seg::after{content:attr(data-lab);position:absolute;left:50%;transform:translateX(-50%);font:800 14px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--c);white-space:nowrap}
+.seg.top::before{bottom:calc(100% + 6px);border-bottom:0;border-radius:6px 6px 0 0}
+.seg.top::after{bottom:calc(100% + 24px)}
+.seg.bot::before{top:calc(100% + 6px + var(--off,0px));border-top:0;border-radius:0 0 6px 6px}
+.seg.bot::after{top:calc(100% + 24px + var(--off,0px))}
+
+/* =========================================================
+   Tables on slides
+   ========================================================= */
+table.tt{width:100%;border-collapse:separate;border-spacing:0;font-size:21px;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tt th{text-align:left;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:9px 16px;background:var(--surface-2)}
+.tt td{padding:8px 16px;border-top:1px solid var(--line);vertical-align:middle}
+.tt.compact td{padding:5px 16px}
+.wrapcode code{white-space:normal}
+.tt hr{width:140px;margin:6px 0;border:0;border-top:2px solid var(--fg)}
+
+/* =========================================================
+   Quiz
+   ========================================================= */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.opt{display:flex;gap:16px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:16px 20px;font-size:24px;transition:all .35s ease}
+.opt .letter{width:40px;height:40px;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:19px;font-weight:800;flex:none;transition:all .35s}
+.opt.correct.shown{border-color:var(--ok);background:var(--ok-soft)}
+.opt.correct.shown .letter{background:var(--ok);color:#fff}
+.opts:has(.correct.shown) .opt:not(.correct){opacity:.38}
+.explain{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 22px;font-size:23px;display:flex;gap:22px;align-items:center}
+.explain .ok-badge{flex:none;background:var(--ok);color:#fff;font-weight:800;font-size:16px;letter-spacing:.06em;padding:6px 12px;border-radius:999px}
+.mini-table{border-collapse:collapse;flex:none}
+.mini-table td{width:58px;height:30px;border:2px solid var(--accent);background:var(--accent-soft)}
+
+/* =========================================================
+   Special slides
+   ========================================================= */
+/* title (always "Tihar night") */
+.s-title{background:radial-gradient(900px 380px at 50% 112%,rgba(255,140,40,.35),transparent 70%),linear-gradient(#140d26,#1f1240);color:#fff;justify-content:center;align-items:center;text-align:center}
+.s-title .pill{background:rgba(255,190,60,.16);color:#ffcf5c;font-size:20px}
+.s-title h1{font-size:104px;line-height:1;margin:18px 0 14px;font-weight:900;letter-spacing:-.025em}
+.s-title .sub{font-size:36px;color:#ffd8a8;font-weight:600}
+.s-title .sub b{color:#9ec5ff}
+.s-title .meta{font-size:20px;color:#b9b3d6;margin-top:22px}
+.hint{position:absolute;right:28px;bottom:18px;font-size:14px;color:#8d87ad}
+.hint kbd{background:transparent;color:#cfc9ec;border-color:#4b4570}
+.toran{position:absolute;left:0;right:0;top:0;height:30px;
+  background:radial-gradient(circle,#ffb703 0 10px,transparent 11px) 0 4px/30px 30px repeat-x,
+             radial-gradient(circle,#fb8500 0 10px,transparent 11px) 15px 4px/30px 30px repeat-x}
+.toran i{position:absolute;top:22px;width:22px;
+  background:radial-gradient(circle,#fb8500 0 10px,transparent 11px) 0 0/22px 22px repeat-y,
+             radial-gradient(circle,#ffb703 0 10px,transparent 11px) 0 11px/22px 22px repeat-y}
+.toran i::after{content:"";position:absolute;left:3px;bottom:-16px;width:16px;height:22px;background:#2f9e44;border-radius:0 100% 0 100%;transform:rotate(45deg)}
+.toran i:nth-child(1){left:6%;height:66px}.toran i:nth-child(2){left:17%;height:110px}.toran i:nth-child(3){left:28%;height:66px}
+.toran i:nth-child(4){left:39%;height:132px}.toran i:nth-child(5){left:50%;height:88px}.toran i:nth-child(6){left:61%;height:132px}
+.toran i:nth-child(7){left:72%;height:66px}.toran i:nth-child(8){left:83%;height:110px}.toran i:nth-child(9){left:93%;height:66px}
+.diyas{position:absolute;left:0;right:0;bottom:46px;display:flex;justify-content:center;gap:58px}
+.diya{position:relative;width:64px;height:58px}
+.diya::before{content:"";position:absolute;left:0;right:0;bottom:0;height:24px;background:linear-gradient(#f76707,#a63d0a);border-radius:4px 4px 40px 40px/4px 4px 28px 28px;box-shadow:0 -3px 0 #ffd43b inset}
+.diya::after{content:"";position:absolute;left:50%;bottom:20px;width:16px;height:32px;margin-left:-8px;
+  background:radial-gradient(ellipse at 50% 78%,#fffbe0 0 18%,#ffd43b 38%,#ff922b 64%,rgba(255,146,43,0) 74%);
+  border-radius:50% 50% 50% 50%/62% 62% 38% 38%;filter:drop-shadow(0 0 12px rgba(255,190,60,.95));
+  transform-origin:50% 100%;animation:flick 1.4s ease-in-out infinite alternate}
+.diya:nth-child(2n)::after{animation-duration:1.1s;animation-delay:-.4s}
+.diya:nth-child(3n)::after{animation-duration:1.7s;animation-delay:-.8s}
+@keyframes flick{0%{transform:scale(1,1) rotate(-2deg)}50%{transform:scale(.92,1.08) rotate(2deg)}100%{transform:scale(1.05,.95) rotate(-1deg)}}
+
+/* section dividers */
+.s-divider{background:var(--div);color:#fff;justify-content:center;--div:#c2410c}
+.s-divider[data-part="css"]{--div:#1d4ed8}
+.s-divider .kicker{color:rgba(255,255,255,.78)}
+.s-divider h1{font-size:92px;line-height:1;margin:8px 0 12px;font-weight:900;letter-spacing:-.025em}
+.s-divider .sub{font-size:32px;color:rgba(255,255,255,.88)}
+.div-num{position:absolute;right:50px;bottom:-60px;font-size:380px;font-weight:900;line-height:1;color:rgba(255,255,255,.12);letter-spacing:-.04em}
+.journey{display:flex;flex-wrap:wrap;gap:10px;margin-top:40px;max-width:1080px}
+.journey span{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:8px 14px;font-size:19px;font-weight:700;line-height:1.2}
+.journey span small{display:block;font:500 13px var(--mono);opacity:.8;margin-top:3px}
+.journey .arr{background:none;border:0;padding:8px 0;opacity:.6}
+
+
+/* file tree */
+.tree{font:23px/1.9 var(--mono);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 24px}
+.tree div{white-space:nowrap}
+.tree .i1{padding-left:34px}.tree .i2{padding-left:68px}
+.tree .d{font-weight:700}
+.tree .new{background:var(--mark);border-radius:6px;padding:0 8px;margin-left:-8px}
+
+/* nesting boxes */
+.nest{border:3px solid var(--html);border-radius:12px;padding:30px 16px 14px;position:relative;font-size:22px}
+.nest>.lab{position:absolute;top:4px;left:12px;font:700 15px var(--mono);color:var(--html-ink)}
+.nest .nest{border-color:var(--css);margin-top:4px}
+.nest .nest>.lab{color:var(--css-ink)}
+.okline,.badline{font:20px var(--mono);padding:8px 12px;border-radius:10px;white-space:nowrap}
+.okline{background:var(--ok-soft);color:var(--ok)}.badline{background:var(--bad-soft);color:var(--bad)}
+
+/* bridge cards */
+.trick h3{font-size:22px}
+.ex{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;margin-top:10px}
+.ex code{font-size:18px}
+.tagl{flex:none;font:800 12px var(--sans);letter-spacing:.08em;padding:4px 8px;border-radius:6px;background:#d9480f;color:#fff}
+.tagl.css{background:#1d4ed8}
+
+/* analogy cards */
+.big-ic{font-size:48px;line-height:1}
+.ana h3{font-size:28px;margin-top:10px}
+.ana .role{font:800 13px var(--sans);letter-spacing:.12em;text-transform:uppercase}
+
+/* three ways */
+.way{display:grid;grid-template-columns:300px 1fr;gap:20px;align-items:center}
+.way .cardh{display:flex;flex-direction:column;gap:6px}
+.way .n{font:900 15px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.verdict{display:inline-block;font-size:16px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--surface-2);color:var(--muted);width:max-content}
+.verdict.best{background:var(--ok-soft);color:var(--ok)}
+
+/* colour swatches */
+.sw{display:inline-block;width:20px;height:20px;border-radius:6px;vertical-align:-3px;margin-right:6px;border:1px solid rgba(0,0,0,.15)}
+.cchip{display:inline-flex;align-items:center;font:18px var(--mono);padding:4px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.picker{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.picker input[type=color]{width:150px;height:96px;border:0;padding:0;background:none;cursor:pointer}
+.pick-out{font:22px/1.6 var(--mono)}
+.pick-sample{font-size:30px;font-weight:800;padding:10px 18px;border-radius:12px;border:2px dashed var(--line)}
+
+/* border style samples */
+.bs{display:flex;gap:12px;flex-wrap:wrap}
+.bs div{font:16px var(--mono);padding:10px 14px;border-radius:4px;background:var(--surface)}
+
+/* box model teaser */
+.boxm{background:repeating-linear-gradient(45deg,#ffe8cc,#ffe8cc 8px,#fff4e6 8px,#fff4e6 16px);padding:22px;border-radius:10px;position:relative;color:#1c1a27}
+.boxm .b{border:4px solid #e8590c;background:#d3f9d8;padding:20px;position:relative}
+.boxm .c{background:#d0ebff;padding:8px;text-align:center;font-weight:700;font-size:18px}
+.boxm .l{position:absolute;font:800 12px var(--sans);letter-spacing:.08em;text-transform:uppercase}
+.boxm>.l{top:3px;left:10px;color:#c2410c}
+.boxm .b>.l{top:1px;left:6px;color:#2b8a3e}
+
+/* devtools mock */
+.dev{display:grid;grid-template-columns:1fr 1.25fr;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);height:270px;flex:none}
+.dev-page{background:#fff;color:#111;position:relative;padding:44px 22px 18px}
+.dev-page .bb{position:absolute;left:0;right:0;top:0;height:30px;background:#e9e9ef;display:flex;gap:5px;align-items:center;padding:0 10px}
+.dev-page .bb i{width:10px;height:10px;border-radius:50%;background:#ff5f57}
+.dev-h1{font:700 34px Georgia,serif;color:#1d4ed8;outline:2px dashed #1d4ed8;outline-offset:3px;background:rgba(29,78,216,.08);display:inline-block}
+.dev-p{font:17px Georgia,serif;margin-top:16px}
+.ctx{position:absolute;left:150px;top:118px;background:#fff;border:1px solid #ccc;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.18);font:15px var(--sans);padding:6px 0;min-width:170px}
+.ctx div{padding:4px 14px;color:#555}.ctx div.on{background:#1d4ed8;color:#fff}
+.dev-tools{background:#242424;color:#ddd;font:15px/1.6 var(--mono);display:flex;flex-direction:column}
+.dev-tabs{display:flex;gap:18px;padding:7px 14px;background:#2f2f2f;border-bottom:1px solid #444;font:13px var(--sans);color:#aaa}
+.dev-tabs b{color:#fff;border-bottom:2px solid #7aa7ff}
+.dev-split{display:grid;grid-template-columns:1fr 1fr;flex:1}
+.dev-dom{padding:10px 12px;border-right:1px solid #444}
+.dev-dom .on{background:#2b4a7a;border-radius:4px}
+.dev-sty{padding:10px 12px}
+.dev-sty .lab{font:12px var(--sans);color:#999;margin-bottom:4px}
+.dev-sty .ck{color:#7aa7ff}
+
+/* common mistakes */
+.mklist{display:flex;flex-direction:column;gap:8px}
+.mk{display:grid;grid-template-columns:330px 24px 440px 1fr;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 12px}
+.mk .w,.mk .r{font:17px var(--mono);padding:4px 9px;border-radius:8px;white-space:nowrap;justify-self:start}
+.mk .w{background:var(--bad-soft);color:var(--bad);text-decoration:line-through;text-decoration-thickness:1.5px}
+.mk .r{background:var(--ok-soft);color:var(--ok)}
+.mk .ar{text-align:center;color:var(--muted)}
+.mk small{font-size:16px;color:var(--muted)}
+
+/* break */
+.s-break{justify-content:center;align-items:center;text-align:center}
+.countdown{display:flex;flex-direction:column;align-items:center;gap:16px}
+.cd-time{font:800 170px/1 var(--mono);letter-spacing:-.04em;color:var(--fg)}
+.countdown.done .cd-time{color:var(--ok)}
+.cd-btns{display:flex;gap:10px}
+.cd-btns button{font:700 18px var(--sans);padding:8px 20px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.cd-btns button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* end slide */
+.s-end{background:linear-gradient(135deg,#140d26,#1f1240 60%,#16245a);color:#fff;justify-content:center;align-items:center;text-align:center}
+.s-end h1{font-size:96px;margin:0 0 8px;font-weight:900;letter-spacing:-.02em}
+.s-end .sub{font-size:30px;color:#ffd8a8}
+
+/* =========================================================
+   UI outside the stage
+   ========================================================= */
+.overlay{position:fixed;inset:0;background:rgba(8,7,12,.84);display:none;z-index:30;align-items:center;justify-content:center;padding:4vh 4vw}
+.overlay.on{display:flex}
+.panel{background:#1d1b27;color:#eee;border-radius:16px;max-width:1150px;width:100%;max-height:92vh;overflow:auto;padding:22px 28px;font:16px/1.5 var(--sans)}
+.panel h3{margin:0 0 12px;font-size:20px}
+#menuList{columns:3 300px;column-gap:28px}
+.mgroup{break-inside:avoid;margin-bottom:14px}
+.mgroup h4{margin:0 0 4px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#ffb48c}
+.mgroup button{display:flex;gap:10px;width:100%;text-align:left;background:none;border:0;color:#ddd;font:15px var(--sans);padding:3px 8px;border-radius:6px;cursor:pointer}
+.mgroup button span{color:#888;min-width:22px;text-align:right}
+.mgroup button:hover,.mgroup button.cur{background:#34314a;color:#fff}
+.keys{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;align-items:center}
+.keys kbd{background:#2c2a3a;color:#fff;border-color:#4a475e}
+#black{position:fixed;inset:0;background:#000;display:none;z-index:40}
+#black.on{display:block}
+#toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:rgba(20,18,28,.94);color:#fff;padding:10px 18px;border-radius:10px;font:15px var(--sans);opacity:0;transition:opacity .25s;z-index:50;pointer-events:none}
+#toast.on{opacity:1}
+#navBtns{position:fixed;right:14px;bottom:14px;display:flex;gap:6px;z-index:15;opacity:0;transition:opacity .3s;pointer-events:none}
+body.mouse #navBtns{opacity:.75;pointer-events:auto}
+#navBtns button{width:38px;height:34px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(20,18,28,.75);color:#fff;font:18px var(--sans);cursor:pointer}
+
+@media (prefers-reduced-motion: reduce){
+  .diya::after{animation:none}
+  .slide,.frag{transition:none!important}
+}
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{height:auto;overflow:visible;background:#fff}
+  #stage{position:static;transform:none!important;width:1280px;height:auto}
+  .slide{position:relative;opacity:1!important;visibility:visible!important;break-after:page;page-break-after:always;transition:none}
+  .frag:not(.keep){opacity:1!important;transform:none!important}
+  .overlay,#black,#toast,#navBtns,.hint{display:none!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* =========================================================
+   Lesson 02 additions
+   ========================================================= */
+:root{--k-m:#d9480f;--k-p:#2b8a3e;--k-c:#1971c2}
+html[data-theme="dark"]{--k-m:#ffa94d;--k-p:#69db7c;--k-c:#74c0fc}
+.k-m{color:var(--k-m)}.k-p{color:var(--k-p)}.k-c{color:var(--k-c)}.k-b{color:var(--fg)}
+
+/* ---------- code-along slides + "Break it" buttons ---------- */
+.ca h2{font-size:32px;margin-bottom:12px}
+.ca .body{gap:12px}
+.ca .tip{font-size:19px;padding:8px 16px;flex:none}
+.tries{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:none}
+.tries .lab{font:800 13px var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 2px 0 10px}
+.tries .lab:first-child{margin-left:0}
+.try{font:700 16px var(--sans);padding:5px 14px;border-radius:999px;border:2px solid var(--bad);background:var(--surface);color:var(--bad);cursor:pointer;transition:background .2s,color .2s}
+.try:hover{background:var(--bad-soft)}
+.try.on{background:var(--bad);color:#fff}
+.try.on::after{content:" · undo";font-weight:600;opacity:.85}
+.seg{display:inline-flex;border:2px solid var(--accent);border-radius:999px;overflow:hidden}
+.seg .try{border:0;border-radius:0;color:var(--accent-ink);background:var(--surface);font:700 16px var(--mono);padding:5px 16px}
+.seg .try+.try{border-left:1px solid var(--line)}
+.seg .try:hover{background:var(--accent-soft)}
+.seg .try.on{background:var(--accent);color:#fff}
+.seg .try.on::after{content:none}
+
+/* ---------- small helpers ---------- */
+.big-arr{font-size:54px;color:var(--accent);font-weight:800;flex:none}
+.tt td.yes{color:var(--ok);font-weight:800}
+.tt td.no{color:var(--bad);font-weight:800}
+.pal{display:flex;flex-direction:column;gap:4px;font-size:17px;margin-top:6px}
+.pal code{font-size:15px}
+table.ent{border-collapse:collapse;margin-top:8px;font-size:18px}
+table.ent td{padding:2px 8px 2px 0}
+table.ent td:nth-child(2n){padding-right:22px;font-weight:800}
+.chipb{font:600 17px var(--mono);padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.chipb:hover{border-color:var(--accent);color:var(--accent-ink)}
+
+/* ---------- today's project: build-up slider ---------- */
+.bu{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;flex:1;min-height:0}
+.bu-side{display:flex;flex-direction:column;gap:14px}
+.bu-card{display:flex;flex-direction:column;gap:6px}
+.bu-step{font:900 40px/1 var(--sans);color:var(--accent);letter-spacing:-.01em}
+.bu-name{font-size:24px;font-weight:700}
+.bu-range{width:100%;margin:10px 0 2px;accent-color:var(--accent);height:26px;cursor:pointer}
+.bu-box{display:flex;gap:10px;align-items:center;font-size:21px;font-weight:700;cursor:pointer}
+.bu-box input{width:22px;height:22px;accent-color:var(--accent);cursor:pointer}
+.bu-view,.selt-view{display:flex;min-height:0;min-width:0;flex:1}
+.bu-view .live-out,.selt-view .live-out{flex:1}
+
+/* ---------- shorthand decoder ---------- */
+.shd{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;flex:1;min-height:0}
+.shd-in{display:flex;align-items:center;gap:8px;font:26px var(--mono);background:var(--code-bg);color:var(--code-fg);padding:12px 18px;border-radius:14px;border:1px solid var(--code-edge);flex:none}
+.shd-in input{font:inherit;flex:1;min-width:0;background:#2b2a3b;color:#fff;border:2px solid #3a384e;border-radius:8px;padding:4px 10px;outline:none}
+.shd-in input:focus{border-color:#7aa7ff}
+.bad .shd-in input{border-color:#ff6b6b}
+.shd-rule{min-height:56px}
+.shd-o{font:700 22px var(--mono)}
+.shd-view{background:#fff8ec;border:1px solid var(--line);border-radius:16px;display:flex;align-items:center;justify-content:center;color:#1c1a27;min-height:0;overflow:hidden}
+.shd-box{background:radial-gradient(circle,rgba(255,255,255,.75) 0 3px,transparent 3.5px) 0 0/14px 14px,#b2f2bb;border:8px solid #a0612b;border-radius:6px;position:relative;transition:padding .3s ease}
+.shd-c{width:100px;height:100px;background:#d0ebff;border-radius:4px;display:grid;place-items:center}
+.shd-c svg{width:82px;height:82px}
+.shd-v{position:absolute;font:800 20px var(--mono);color:#2b8a3e;white-space:nowrap}
+.shd-t{bottom:100%;left:50%;transform:translate(-50%,-8px)}
+.shd-b{top:100%;left:50%;transform:translate(-50%,8px)}
+.shd-l{right:100%;top:50%;transform:translate(-10px,-50%)}
+.shd-r{left:100%;top:50%;transform:translate(10px,-50%)}
+
+/* ---------- selector tester ---------- */
+.selt{display:grid;grid-template-columns:440px minmax(0,1fr);gap:20px;flex:1;min-height:0}
+.selt-in{font-size:24px}
+.selt-res{font-size:22px;font-weight:800;color:var(--accent-ink);flex:none}
+.selt.bad .selt-res{color:var(--bad)}
+
+/* ---------- DevTools box model mock ---------- */
+.dtbm{flex:none;width:520px;font:15px var(--mono);color:#222;text-align:center}
+.dt-m,.dt-b,.dt-p{position:relative;padding:30px 44px}
+.dt-m{background:#f9cc9d;border:1px dashed #333}
+.dt-b{background:#fddd9b;border:2px solid #000}
+.dt-p{background:#c3d08b;border:1px dashed #333}
+.dt-c{background:#8cb6c0;padding:12px 8px;border:1px solid #808080}
+.dt-l{position:absolute;top:5px;left:8px;font-size:13px}
+.dt-n{position:absolute;font-weight:700}
+.dt-t{top:6px;left:50%;transform:translateX(-50%)}
+.dt-bo{bottom:6px;left:50%;transform:translateX(-50%)}
+.dt-le{left:14px;top:50%;transform:translateY(-50%)}
+.dt-r{right:14px;top:50%;transform:translateY(-50%)}
+
+/* =========================================================
+   Part 1 picture story: a teddy in a gift box
+   teddy = content (blue) · stuffing = padding (green) · wall = border (brown) · empty space = margin (orange stripes)
+   The engine puts at1, at2 … on the slide as the steps are revealed.
+   ========================================================= */
+:root{--w-b:#8a4b14;--w-n1:#7048e8;--w-n2:#0b8f6b;--w-k1:#7048e8;--w-k2:#0b8f6b;--w-k3:#c2255c;--w-k4:#b7791f}
+html[data-theme="dark"]{--w-b:#e0a370;--w-n1:#b197fc;--w-n2:#38d9a9;--w-k1:#b197fc;--w-k2:#38d9a9;--w-k3:#f783ac;--w-k4:#fcc419}
+.w-c{color:var(--k-c)}.w-p{color:var(--k-p)}.w-b{color:var(--w-b)}.w-m{color:var(--k-m)}
+.w-n1{color:var(--w-n1)}.w-n2{color:var(--w-n2)}.w-k1{color:var(--w-k1)}.w-k2{color:var(--w-k2)}.w-k3{color:var(--w-k3)}.w-k4{color:var(--w-k4)}
+.mark{display:none}
+.say{font-size:28px;line-height:1.35;font-weight:600}
+.say.small{font-size:21px;font-weight:500}
+.say.bad{color:var(--bad)}.say.good{color:var(--ok)}
+.slide code.cchip{font:700 24px var(--mono);background:var(--code-bg);color:#ffd8a8;padding:8px 18px;border-radius:10px;white-space:nowrap}
+.bigcode{font:700 30px var(--mono);background:var(--code-bg);color:var(--code-fg);padding:14px 22px;border-radius:14px;align-self:flex-start;white-space:nowrap}
+.bigcode span{padding:0 4px;border-radius:6px;transition:background .3s,color .3s}
+.chant{font-size:24px;font-weight:700}
+.legend{display:flex;align-items:center;gap:14px;font-size:24px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 14px}
+.legend .sw{width:28px;height:28px;margin:0;flex:none}
+.sw-c{background:#d0ebff}.sw-p{background:#b2f2bb}.sw-b{background:#a0612b}
+.sw-m{background:repeating-linear-gradient(45deg,#ffd8a8 0 4px,#fff4e6 4px 8px)}
+.pair{display:flex;align-items:center}
+
+/* ---------- the parts of the picture ---------- */
+.teddy{display:block}
+.gc{position:relative;width:var(--cs,120px);height:var(--cs,120px);background:#d0ebff;border-radius:4px;display:grid;place-items:center;flex:none}
+.gc svg{width:84%;height:84%}
+.gb{display:inline-block;position:relative;vertical-align:middle;--bw:10px;--pd:30px;padding:var(--pd);border:var(--bw) solid #a0612b;border-radius:6px;
+  background:radial-gradient(circle,rgba(255,255,255,.75) 0 3px,transparent 3.5px) 0 0/14px 14px,#b2f2bb;
+  transition:padding .9s ease,border-width .9s ease}
+.gm{display:inline-block;position:relative;vertical-align:middle;--m:0px;padding:var(--m);border-radius:8px;
+  background:repeating-linear-gradient(45deg,#ffd8a8 0 9px,#fff4e6 9px 18px);transition:padding .9s ease}
+.wb{display:inline-block;position:relative;--bw:0px;--pd:0px;padding:var(--pd);border:var(--bw) solid #a0612b;background:#b2f2bb;
+  font:700 30px/1.2 Georgia,serif;color:#1c1a27;transition:padding .9s ease,border-width .9s ease}
+.wc{display:block;background:#d0ebff;padding:6px 12px}
+.ltag{position:absolute;font:800 12px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;z-index:2}
+.lt-c{top:calc(100% + 14px);left:50%;width:140px;margin-left:-70px;text-align:center;color:#1864ab;font-size:17px}
+.lt-p{top:5px;left:7px;color:#2b8a3e}
+.lt-b{top:calc(-1 * var(--bw));left:14px;line-height:var(--bw);color:#fff;font-size:11px}
+.lt-m{top:5px;left:7px;color:#c2410c}
+.band{position:absolute;display:grid;place-items:center;font:800 14px/1 var(--mono);font-style:normal;color:#fff;opacity:0;transition:opacity .4s ease;z-index:1}
+.bt{left:0;right:0;top:0;height:var(--t)}.bb{left:0;right:0;bottom:0;height:var(--b)}
+.bl{top:0;bottom:0;left:0;width:var(--l)}.br{top:0;bottom:0;right:0;width:var(--r)}
+.ptr{position:absolute;font:900 44px/1 var(--sans);color:#e03131;z-index:3}
+
+/* ---------- story slides: real life | on a web page ---------- */
+.st-row{display:grid;grid-template-columns:640px minmax(0,1fr);gap:22px;height:330px;flex:none}
+.st-real,.st-web{position:relative;border-radius:18px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.st-real{background:#fff8ec;border:1px solid #eadfcc;box-shadow:inset 0 -14px 0 #e6cfa8}
+.st-web{background:#fff;border:1px solid var(--line);flex-direction:column;gap:22px}
+.st-tag{position:absolute;top:12px;left:16px;font:800 13px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#8a7a66}
+
+/* 1 · content */
+.sc-content .gb{--bw:0px;--pd:0px;--cs:150px}
+.sc-content .wb{--bw:0px;--pd:0px}
+/* 2 · border */
+.sc-border .gb{--bw:0px;--pd:0px;--cs:140px}
+.at1 .sc-border .gb{--bw:14px}
+.sc-border .wb{--bw:0px;--pd:0px}
+.at1 .sc-border .wb{--bw:6px}
+/* 3 · padding */
+.sc-pad .gb{--bw:14px;--pd:0px;--cs:140px}
+.at1 .sc-pad .gb{--pd:40px}
+.sc-pad .wb{--bw:6px;--pd:0px}
+.at1 .sc-pad .wb{--pd:24px}
+/* 4 · margin */
+.sc-mar .gb{--bw:8px;--pd:18px;--cs:90px}
+.sc-mar .gm{--m:0px}
+.at1 .sc-mar .gm{--m:36px}
+.sc-mar .wb{--bw:4px;--pd:10px;font-size:22px}
+.at1 .sc-mar .st-web .gm{--m:24px}
+/* all four */
+.sc-all{flex:none}
+.sc-all .gm{--m:34px}
+.sc-all .gb{--bw:14px;--pd:40px;--cs:130px}
+.sc-all .lt-c{top:auto;bottom:6px;font-size:12px;color:#1864ab}
+/* game */
+.game-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.game-pic{height:280px;width:100%;display:flex;align-items:center;justify-content:center;background:#fff8ec;border-radius:12px}
+.game-q{font-size:26px;font-weight:700}
+.game-a{font-size:26px;font-weight:700;background:var(--ok-soft);color:var(--ok);padding:6px 18px;border-radius:999px}
+.sc-gameA .gb{--bw:10px;--pd:34px;--cs:100px}
+.sc-gameA .ptr{top:-26px;left:3px}
+.sc-gameB .gb{--bw:8px;--pd:16px;--cs:80px}
+.sc-gameB .gm{--m:32px}
+.sc-gameB .ptr{top:-30px;right:3px}
+/* quick check picture */
+.sc-q1{flex:none;background:#fff8ec;border-radius:14px;padding:24px}
+.sc-q1 .gm{--m:30px}
+.sc-q1 .gb{--bw:12px;--pd:36px;--cs:110px}
+
+/* ---------- playground ---------- */
+.bmp{display:grid;grid-template-columns:420px minmax(0,1fr);gap:22px;flex:1;min-height:0}
+.bmp-ctrl{display:flex;flex-direction:column;gap:12px;min-height:0}
+.bmp-row{display:grid;grid-template-columns:130px 1fr 64px;align-items:center;gap:10px;font-size:21px;font-weight:700;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer}
+.bmp-row .sw{width:20px;height:20px}
+.bmp-row input{width:100%;accent-color:var(--accent);cursor:pointer}
+.bmp-row output{font:700 19px var(--mono);text-align:right}
+.bmp-sum{color:var(--muted)}
+.bmp-view{background:#fff8ec;border:1px solid #eadfcc;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:0}
+.bmp .gb,.bmp .gm{transition:none}
+.pg-b{--cs:110px}
+.pg-n{--bw:6px;--pd:10px}
+.gc-s{--cs:60px}
+
+/* ---------- how wide is the box? content-box vs border-box ----------
+   The box has width: 200px, padding: 30px, border: 10px. The picture fakes it with --cs / --pd / --bw:
+   content-box: teddy stays 200px and the box grows to 280px · border-box: the box stays 200px and teddy shrinks to 120px. */
+.bs{position:relative;width:var(--bsw,500px);height:380px;flex:none;display:flex;align-items:center;justify-content:center;
+  background:#fff8ec;border:1px solid #eadfcc;border-radius:18px}
+.bs .gc{transition:width .9s ease,height .9s ease}
+.bs-slot{position:absolute;left:50%;top:44px;bottom:44px;width:200px;margin-left:-100px;border:3px dashed #495057;border-top:0;border-bottom:0;
+  z-index:2;pointer-events:none;transition:border-color .4s ease}
+.bs-dim,.bs-tot{position:absolute;left:50%;height:28px;display:grid;place-items:center;font:800 19px/1 var(--mono);transition:opacity .5s ease}
+.bs-dim::before,.bs-tot::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px solid currentColor}
+.bs-dim::after,.bs-tot::after{content:"";position:absolute;left:0;right:0;top:6px;bottom:6px;border-left:2px solid currentColor;border-right:2px solid currentColor}
+.bs-dim span,.bs-tot span{position:relative;background:#fff8ec;padding:0 8px}
+.bs-dim{top:10px;width:200px;margin-left:-100px;color:#495057}
+.bs-tot{top:342px;opacity:0}
+.bs-big{width:280px;margin-left:-140px;color:#c92a2a}
+.bs-fit{width:200px;margin-left:-100px;color:#2b8a3e}
+.bs-name{position:absolute;top:12px;left:16px;font:800 20px/1 var(--mono);color:#1c1a27}
+/* 1 · content-box: the stuffing and the wall are added outside the 200px */
+.sc-cbox .gb{--cs:200px;--pd:0px;--bw:0px}
+.at1 .sc-cbox .gb{--pd:30px;--bw:10px}
+.at1 .sc-cbox .bs-slot{border-color:#e03131;transition-delay:.6s}
+.at1 .sc-cbox .bs-big{opacity:1;transition-delay:.7s}
+/* 2 · border-box: the box stays 200px, teddy gets smaller */
+.sc-bbox .gb{--cs:200px;--pd:30px;--bw:10px}
+.at1 .sc-bbox .gb{--cs:120px}
+.sc-bbox .bs-slot{border-color:#e03131}
+.at1 .sc-bbox .bs-slot{border-color:#2b8a3e;transition-delay:.6s}
+.sc-bbox .bs-big{opacity:1}
+.at1 .sc-bbox .bs-big{opacity:0}
+.at1 .sc-bbox .bs-fit{opacity:1;transition-delay:.7s}
+/* 3 · side by side */
+.bs-pair{--bsw:560px}
+.bs-pair .col{align-items:center}
+.sc-cmpA .gb{--cs:200px;--pd:30px;--bw:10px}
+.sc-cmpA .bs-slot{border-color:#e03131}
+.sc-cmpA .bs-big{opacity:1}
+.sc-cmpB .gb{--cs:120px;--pd:30px;--bw:10px}
+.sc-cmpB .bs-slot{border-color:#2b8a3e}
+.sc-cmpB .bs-fit{opacity:1}
+
+/* ---------- short ways to write it ---------- */
+.sc-four{flex:none}
+.sc-four .gb{--bw:10px;--pd:40px;--cs:100px;--t:40px;--b:40px;--l:40px;--r:40px}
+.sc-four .band{background:rgba(43,138,62,.88)}
+.at1 .sc-four .band{opacity:1}
+.gb.sc-two{--bw:10px;--cs:120px;padding:20px 60px;--t:20px;--b:20px;--l:60px;--r:60px}
+.sc-two .bt,.sc-two .bb{background:rgba(112,72,232,.9)}
+.sc-two .bl,.sc-two .br{background:rgba(11,143,107,.9)}
+.at1 .sc-two .bt,.at1 .sc-two .bb,.at2 .sc-two .bl,.at2 .sc-two .br{opacity:1}
+.at1 .n1{background:#7048e8;color:#fff}
+.at2 .n2{background:#0b8f6b;color:#fff}
+.clock{position:relative;width:440px;height:440px;flex:none;display:grid;place-items:center}
+.clock-face{position:absolute;inset:20px;border:3px dashed #c9b79c;border-radius:50%;background:#fff8ec}
+.clock-n{position:absolute;font:800 22px/28px var(--sans);color:#8a7a66}
+.c12,.c6{left:0;right:0;text-align:center}
+.c12{top:28px}.c6{bottom:28px}
+.c3,.c9{top:206px}
+.c3{right:30px}.c9{left:34px}
+.clock-hand{position:absolute;left:217px;bottom:220px;width:6px;height:160px;border-radius:3px;background:#495057;transform-origin:50% 100%;transform:rotate(-45deg);transition:transform .7s ease}
+.at1 .clock-hand{transform:rotate(0deg)}
+.at2 .clock-hand{transform:rotate(90deg)}
+.at3 .clock-hand{transform:rotate(180deg)}
+.at4 .clock-hand{transform:rotate(270deg)}
+.gb.sc-clock{--bw:10px;--cs:110px;padding:20px 40px 60px 80px;--t:20px;--r:40px;--b:60px;--l:80px;z-index:1}
+.sc-clock .bt{background:rgba(112,72,232,.92)}
+.sc-clock .br{background:rgba(11,143,107,.92)}
+.sc-clock .bb{background:rgba(194,37,92,.92)}
+.sc-clock .bl{background:rgba(183,121,31,.95)}
+.at1 .sc-clock .bt,.at2 .sc-clock .br,.at3 .sc-clock .bb,.at4 .sc-clock .bl{opacity:1}
+.at1 .k1{background:#7048e8;color:#fff}
+.at2 .k2{background:#0b8f6b;color:#fff}
+.at3 .k3{background:#c2255c;color:#fff}
+.at4 .k4{background:#b7791f;color:#fff}
+
+/* ---------- the browser's gap ---------- */
+.bgap{width:620px;height:330px;flex:none;border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column;background:#fff}
+.bgap-bar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:#e9e9ef;border-bottom:1px solid #d6d6de;flex:none}
+.bgap-bar .dots{display:flex;gap:5px}
+.bgap-bar .dots i{width:11px;height:11px;border-radius:50%;background:#ff5f57}
+.bgap-bar .dots i:nth-child(2){background:#febc2e}.bgap-bar .dots i:nth-child(3){background:#28c840}
+.bgap-url{flex:1;background:#fff;border-radius:6px;padding:3px 10px;font:13px var(--mono);color:#555}
+.bgap-page{flex:1;background:#fdf6ec}
+.bgap-head{margin:16px;padding:24px;background:#1e3a8a;color:#fff;font:700 26px Georgia,serif;letter-spacing:2px;text-align:center;transition:margin .9s ease}
+.at1 .bgap-head{margin:0}
+
+/* ---------- in the middle ---------- */
+.shelf{position:relative;width:900px;height:190px;flex:none;align-self:center;border-bottom:12px solid #c99a63}
+.gb.sh-box{position:absolute;left:0;bottom:0;--bw:8px;--pd:20px;--cs:100px;transition:transform 1s ease}
+.at1 .gb.sh-box{transform:translateX(372px)}
+.sh-auto{position:absolute;bottom:0;width:372px;height:156px;display:grid;place-items:center;font:800 26px var(--mono);color:#c2410c;border-radius:6px;
+  background:repeating-linear-gradient(45deg,#ffd8a8 0 9px,#fff4e6 9px 18px);opacity:0;transition:opacity .5s ease .7s}
+.sh-l{left:0}.sh-r{right:0}
+.at1 .sh-auto{opacity:1}
+.gb.tb-box{display:block;width:900px;flex:none;align-self:center;--bw:8px;--pd:20px;--cs:100px}
+.tb-teddy{transition:transform 1s ease}
+.at1 .tb-teddy{transform:translateX(372px)}
+
+/* ---------- display: how boxes sit on the shelf ---------- */
+.dsh{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 18px;flex:none}
+.dsh-lab b{display:block;font:800 26px var(--mono);color:var(--accent-ink)}
+.dsh-lab span{font-size:19px;color:var(--muted)}
+.dsh-demo{color:#1c1a27}
+.dbk{display:block;height:26px;margin:3px 0;padding:0 10px;background:#b2f2bb;border:3px solid #a0612b;font:700 14px/20px var(--sans)}
+.dsh-text{font-size:22px;color:var(--fg)}
+.din{display:inline;height:60px;padding:2px 6px;background:#b2f2bb;border:3px solid #a0612b;color:#1c1a27;font-weight:700}
+.dno{margin-left:14px;font:700 16px var(--mono);color:var(--bad)}
+.dib{display:inline-block;margin-right:12px;padding-top:6px;vertical-align:bottom;text-align:center;background:#b2f2bb;border:3px solid #a0612b;font:800 18px var(--sans);color:#1c1a27}
+
+/* ---------- boxes inside boxes ---------- */
+.nb-big{position:relative;display:flex;align-items:center;gap:36px;padding:40px 36px 30px;border:10px solid #a0612b;background:#fff8ec;border-radius:8px;flex:none}
+.nb-small{position:relative;padding:34px 22px 20px;border:7px solid #a0612b;background:#f1ece3;border-radius:6px}
+.nb-lab{position:absolute;top:7px;left:10px;font:800 18px/1 var(--mono);color:#8a4b14}
+.nt{position:relative;width:110px;height:110px;background:#d0ebff;border-radius:8px;display:grid;place-items:center;outline:6px solid transparent;transition:outline-color .4s,background .4s,opacity .4s}
+.nt svg{width:84px;height:84px}
+.nt-lab{position:absolute;right:-6px;bottom:-6px;font:800 16px/1 var(--mono);background:#1c1a27;color:#fff;border-radius:6px;padding:4px 7px}
+.at1 .sc-nest .nt{outline-color:#fcc419;background:#fff3bf}
+.at2 .sc-nest .nt-b{outline-color:transparent;background:#d0ebff;opacity:.35}
+.nt-ask{outline:4px dashed #e03131}
+
+/* ---------- today: the finished page, then its boxes ---------- */
+.pfbox{display:flex;flex:1;min-width:0;min-height:0}
+.pfbox .live-out{flex:1}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="teddy" viewBox="0 0 100 100">
+    <circle cx="22" cy="24" r="15" fill="#9c5a2e"/><circle cx="78" cy="24" r="15" fill="#9c5a2e"/>
+    <circle cx="22" cy="24" r="7" fill="#e3a878"/><circle cx="78" cy="24" r="7" fill="#e3a878"/>
+    <circle cx="50" cy="56" r="38" fill="#b86b35"/>
+    <ellipse cx="50" cy="69" rx="17" ry="13" fill="#efc49b"/>
+    <circle cx="36" cy="48" r="5" fill="#222"/><circle cx="64" cy="48" r="5" fill="#222"/>
+    <ellipse cx="50" cy="63" rx="6" ry="4.5" fill="#222"/>
+    <path d="M43 72 Q50 78 57 72" stroke="#222" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </symbol>
+</svg>
+<div id="stage">
+
+
+<!-- =========================================================
+     PART 1 · THE BOX MODEL (the gift box story)
+     ========================================================= -->
+<section class="slide s-divider" data-part="css" data-title="Part 1 · The Box Model" data-section="Box Model" data-nofoot>
+  <div class="div-num" aria-hidden="true">01</div>
+  <p class="kicker">Part 1</p>
+  <h1>The Box Model</h1>
+  <p class="sub">Every part of a web page is a box</p>
+  <div class="journey">
+    <span>Boxes everywhere</span><span class="arr">→</span><span>The 4 parts of a box</span><span class="arr">→</span><span>How wide is the box?</span><span class="arr">→</span><span>Short ways to write it</span><span class="arr">→</span><span>The browser's gap</span><span class="arr">→</span><span>In the middle</span><span class="arr">→</span><span>Side by side?</span><span class="arr">→</span><span>Boxes inside boxes</span>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="Boxes everywhere">
+  <p class="kicker">Today</p>
+  <h2>This is the website you will build today</h2>
+  <div class="body">
+    <div class="row fill">
+      <div class="pfbox" data-zoom="0.62" data-box-step="1"></div>
+      <div class="col" style="width:330px;flex:none;justify-content:center;gap:22px">
+        <p class="say frag" data-step="1">Look! Every part is a <b>box</b>.</p>
+        <p class="say frag" data-step="2">So first, we learn how a box works.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="From plain to pretty">
+  <p class="kicker">Today's project</p>
+  <h2>From plain to pretty in 10 steps</h2>
+  <div class="body">
+    <div class="bu" data-zoom="0.62" data-start="0">
+      <div class="bu-side">
+        <div class="card tight bu-card">
+          <div class="bu-step">STEP 0</div>
+          <div class="bu-name">Plain HTML, no CSS</div>
+          <input type="range" class="bu-range" min="0" max="10" value="0" aria-label="How many CSS steps to show">
+          <p class="xs muted">Drag the slider →</p>
+        </div>
+        <label class="bu-box"><input type="checkbox"> Show the boxes</label>
+      </div>
+      <div class="bu-view"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- the 4 parts, one at a time ---------- -->
+<section class="slide story" data-part="css" data-title="Box part 1 · content">
+  <p class="kicker">The box · part 1 of 4</p>
+  <h2>Meet our teddy</h2>
+  <div class="body">
+    <div class="st-row sc-content">
+      <div class="st-real"><span class="st-tag">Real life</span>
+        <div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div><span class="ltag lt-c frag" data-step="1">content</span></div>
+      </div>
+      <div class="st-web"><span class="st-tag">On a web page</span>
+        <div class="wb"><span class="wc">Namaste!</span><span class="ltag lt-c frag" data-step="1">content</span></div>
+      </div>
+    </div>
+    <p class="say frag" data-step="1">The thing we want to show is the <b class="w-c">content</b>.</p>
+    <p class="say frag" data-step="2">On a web page, the content is your <b>words</b> or your <b>picture</b>.</p>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="Box part 2 · border">
+  <p class="kicker">The box · part 2 of 4</p>
+  <h2>Teddy needs a box</h2>
+  <div class="body">
+    <div class="st-row sc-border">
+      <div class="st-real"><span class="st-tag">Real life</span>
+        <div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div>
+      </div>
+      <div class="st-web"><span class="st-tag">On a web page</span>
+        <div class="wb"><span class="wc">Namaste!</span></div>
+        <code class="cchip frag" data-step="1">border: 6px solid brown;</code>
+      </div>
+    </div>
+    <p class="say frag" data-step="1">The wall around the box is the <b class="w-b">border</b>.</p>
+    <p class="say bad frag" data-step="2">But teddy is squashed against the wall!</p>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="Box part 3 · padding">
+  <p class="kicker">The box · part 3 of 4</p>
+  <h2>Teddy is squashed!</h2>
+  <div class="body">
+    <div class="st-row sc-pad">
+      <div class="st-real"><span class="st-tag">Real life</span>
+        <div class="gb"><span class="ltag lt-p frag" data-step="1">padding</span><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div>
+      </div>
+      <div class="st-web"><span class="st-tag">On a web page</span>
+        <div class="wb"><span class="wc">Namaste!</span></div>
+        <code class="cchip frag" data-step="1">padding: 24px;</code>
+      </div>
+    </div>
+    <p class="say frag" data-step="1">We fill the box with soft stuffing: the <b class="w-p">padding</b>.</p>
+    <p class="say good frag" data-step="2">Padding = space <b>inside</b> the wall. Now teddy has room!</p>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="Box part 4 · margin">
+  <p class="kicker">The box · part 4 of 4</p>
+  <h2>The boxes are squashed together!</h2>
+  <div class="body">
+    <div class="st-row sc-mar">
+      <div class="st-real"><span class="st-tag">Real life</span>
+        <div class="pair"><div class="gm"><span class="ltag lt-m frag" data-step="1">margin</span><div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div></div><div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div></div>
+      </div>
+      <div class="st-web"><span class="st-tag">On a web page</span>
+        <div class="pair"><div class="gm"><div class="wb"><span class="wc">Namaste!</span></div></div><div class="wb"><span class="wc">Hello!</span></div></div>
+        <code class="cchip frag" data-step="1">margin: 24px;</code>
+      </div>
+    </div>
+    <p class="say frag" data-step="1">We leave empty space around the box: the <b class="w-m">margin</b>.</p>
+    <p class="say good frag" data-step="2">Margin = space <b>outside</b> the wall. It pushes other boxes away.</p>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="One box, four parts">
+  <p class="kicker">All together</p>
+  <h2>One box, four parts</h2>
+  <div class="body">
+    <div class="row fill" style="align-items:center;gap:40px">
+      <div class="sc-all">
+        <div class="gm"><span class="ltag lt-m">margin</span><div class="gb"><span class="ltag lt-b">border</span><span class="ltag lt-p">padding</span><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg><span class="ltag lt-c">content</span></div></div></div>
+      </div>
+      <div class="col grow" style="gap:12px">
+        <div class="legend frag" data-step="1"><i class="sw sw-c"></i><span><b class="w-c">content</b> = teddy (your words)</span></div>
+        <div class="legend frag" data-step="2"><i class="sw sw-p"></i><span><b class="w-p">padding</b> = soft space <b>inside</b></span></div>
+        <div class="legend frag" data-step="3"><i class="sw sw-b"></i><span><b class="w-b">border</b> = the wall</span></div>
+        <div class="legend frag" data-step="4"><i class="sw sw-m"></i><span><b class="w-m">margin</b> = empty space <b>outside</b></span></div>
+        <script type="text/x-code" data-lang="css" data-fs="20" data-step-lines="|2|3|4" data-file="style.css">
+.box {
+    padding: 30px;
+    border: 6px solid brown;
+    margin: 30px;
+}
+        </script>
+        <p class="chant frag" data-step="5">Inside → outside: <b class="w-c">content</b> → <b class="w-p">padding</b> → <b class="w-b">border</b> → <b class="w-m">margin</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="Game: inside or outside?">
+  <p class="kicker">Game</p>
+  <h2>Padding or margin?</h2>
+  <div class="body">
+    <div class="g2 fill">
+      <div class="game-card">
+        <div class="game-pic sc-gameA"><div class="gb"><span class="ptr">↓</span><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div></div>
+        <p class="game-q">What is this space?</p>
+        <p class="game-a frag" data-step="1"><b class="w-p">padding</b> ✓ inside the wall</p>
+      </div>
+      <div class="game-card">
+        <div class="game-pic sc-gameB"><div class="pair"><div class="gm"><span class="ptr">↓</span><div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div></div><div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div></div></div>
+        <p class="game-q">And this space?</p>
+        <p class="game-a frag" data-step="2"><b class="w-m">margin</b> ✓ outside the wall</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Your turn: build the box">
+  <p class="kicker">Your turn · playground</p>
+  <h2>Move the sliders: build teddy's box</h2>
+  <div class="body">
+    <div class="bmp">
+      <div class="bmp-ctrl">
+        <label class="bmp-row"><span><i class="sw sw-p"></i>padding</span><input type="range" min="0" max="60" value="24" data-k="p"><output>24px</output></label>
+        <label class="bmp-row"><span><i class="sw sw-b"></i>border</span><input type="range" min="0" max="20" value="8" data-k="b"><output>8px</output></label>
+        <label class="bmp-row"><span><i class="sw sw-m"></i>margin</span><input type="range" min="0" max="60" value="30" data-k="m"><output>30px</output></label>
+        <div class="cb"><div class="cb-tab"><span class="fi fi-css">#</span><span>style.css</span></div><pre style="--fs:19px"><code class="bmp-code"></code></pre></div>
+        <p class="small bmp-sum"></p>
+      </div>
+      <div class="bmp-view">
+        <div class="pair"><div class="gm pg-m"><div class="gb pg-b"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div></div><div class="gb pg-n"><div class="gc gc-s"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Try it: padding vs margin">
+  <p class="kicker">Your turn · real code</p>
+  <h2>Now with real code</h2>
+  <div class="body">
+    <div class="row fill">
+      <div class="live" data-show="css" data-split="1fr 1fr" data-fs="19" data-zoom="1" data-url="index.html">
+        <script type="text/x-html">
+<div class="box">I am a box</div>
+<div class="box">I am another box</div>
+        </script>
+        <script type="text/x-css">
+.box {
+    background-color: #fdf6ec;
+    padding: 20px;
+    border: 4px solid #c2410c;
+    margin: 30px;
+}
+        </script>
+      </div>
+      <div class="card col wrapcode" style="width:330px;flex:none">
+        <h3>Try these</h3>
+        <ol class="list small">
+          <li>More stuffing: <code>padding: 50px;</code></li>
+          <li>No space outside: <code>margin: 0;</code></li>
+          <li>A thick wall: <code>10px</code> border</li>
+          <li>Right-click a box → <b>Inspect</b></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- how wide is the box? content-box vs border-box ---------- -->
+<section class="slide story" data-part="css" data-title="How wide? · content-box">
+  <p class="kicker">How wide is the box? · 1</p>
+  <h2>Teddy's box should be 200px wide</h2>
+  <div class="body">
+    <div class="row fill" style="align-items:center;gap:36px">
+      <div class="bs sc-cbox">
+        <div class="bs-dim"><span>200px</span></div>
+        <div class="bs-slot"></div>
+        <div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div>
+        <div class="bs-tot bs-big"><span>280px</span></div>
+      </div>
+      <div class="col grow" style="gap:14px">
+        <code class="cchip" style="align-self:flex-start">width: 200px;</code>
+        <p class="say"><code>width</code> = how wide. Teddy is 200px wide. He fits!</p>
+        <div class="col frag" data-step="1" style="gap:8px;align-items:flex-start"><code class="cchip">padding: 30px;</code><code class="cchip">border: 10px solid brown;</code></div>
+        <p class="say bad frag" data-step="1">Oh no! Now the box is <b>280px</b> wide!</p>
+        <p class="say small frag" data-step="2"><code>width</code> was only for <b class="w-c">teddy</b>. The stuffing and the wall are added <b>outside</b> it: 200 + 30 + 30 + 10 + 10 = <b>280px</b></p>
+        <p class="say frag" data-step="3">This normal way is called <code>content-box</code>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="How wide? · border-box">
+  <p class="kicker">How wide is the box? · 2</p>
+  <h2>The box is too wide! Make it 200px again</h2>
+  <div class="body">
+    <div class="row fill" style="align-items:center;gap:36px">
+      <div class="bs sc-bbox">
+        <div class="bs-dim"><span>200px</span></div>
+        <div class="bs-slot"></div>
+        <div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div>
+        <div class="bs-tot bs-big"><span>280px</span></div>
+        <div class="bs-tot bs-fit"><span>200px</span></div>
+      </div>
+      <div class="col grow" style="gap:14px">
+        <p class="say">We want the <b>whole box</b> to be 200px, wall to wall.</p>
+        <code class="cchip frag" data-step="1" style="align-self:flex-start">box-sizing: border-box;</code>
+        <p class="say good frag" data-step="1">It fits! The whole box is 200px.</p>
+        <p class="say small frag" data-step="2">The stuffing and the wall now stay <b>inside</b> the 200px, so teddy gets smaller: 200 − 30 − 30 − 10 − 10 = <b>120px</b></p>
+        <p class="say frag" data-step="3"><code>border-box</code>: <code>width</code> = the whole box, up to the <b class="w-b">wall</b>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="content-box vs border-box">
+  <p class="kicker">Two ways to measure</p>
+  <h2>Same CSS, two different boxes</h2>
+  <div class="body">
+    <div class="g2 bs-pair">
+      <div class="col" style="gap:12px">
+        <div class="bs sc-cmpA"><span class="bs-name">content-box</span>
+          <div class="bs-dim"><span>200px</span></div>
+          <div class="bs-slot"></div>
+          <div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div>
+          <div class="bs-tot bs-big"><span>280px</span></div>
+        </div>
+        <div class="legend frag" data-step="1"><i class="sw sw-c"></i><span><code>content-box</code>: width = <b class="w-c">teddy</b> only</span></div>
+      </div>
+      <div class="col" style="gap:12px">
+        <div class="bs sc-cmpB"><span class="bs-name">border-box</span>
+          <div class="bs-dim"><span>200px</span></div>
+          <div class="bs-slot"></div>
+          <div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div>
+          <div class="bs-tot bs-fit"><span>200px</span></div>
+        </div>
+        <div class="legend frag" data-step="2"><i class="sw sw-b"></i><span><code>border-box</code>: width = up to the <b class="w-b">wall</b></span></div>
+      </div>
+    </div>
+    <p class="chant frag" data-step="3" style="text-align:center">Our portfolio: <code>* { box-sizing: border-box; }</code> → every box</p>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Try it: content-box vs border-box">
+  <p class="kicker">Your turn · box-sizing</p>
+  <h2>Try it: two boxes, both <code>width: 200px</code></h2>
+  <div class="body">
+    <div class="row fill">
+      <div class="col grow">
+        <div class="live" data-show="css" data-split="1fr 1fr" data-fs="19" data-zoom="1" data-url="index.html">
+          <script type="text/x-html">
+<div class="box">A: content-box</div>
+<div class="box fit">B: border-box</div>
+          </script>
+          <script type="text/x-css">
+.box {
+    width: 200px;
+    padding: 30px;
+    border: 10px solid brown;
+    margin-bottom: 20px;
+    background-color: #fdf6ec;
+}
+.fit {
+    box-sizing: border-box;
+}
+          </script>
+        </div>
+        <div class="tries"><span class="lab">padding</span><span class="seg" data-prop="padding"><button type="button" class="try" data-val="10px">10px</button><button type="button" class="try" data-val="30px">30px</button><button type="button" class="try" data-val="50px">50px</button></span><span class="lab">.fit</span><span class="seg" data-prop="box-sizing"><button type="button" class="try" data-val="content-box">content-box</button><button type="button" class="try" data-val="border-box">border-box</button></span></div>
+      </div>
+      <div class="col" style="width:330px;flex:none;gap:12px">
+        <div class="card tight small">Box <b>A</b> grows with the padding. Box <b>B</b> stays <b>200px</b>.</div>
+        <div class="card tight small">Box A has no <code>box-sizing</code> line: <code>content-box</code> is the normal way.</div>
+        <div class="card tight small"><code>margin</code> is never counted. It is <b>outside</b> the box.</div>
+        <div class="card tight small">Right-click a box → <b>Inspect</b> → <b>Computed</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- short ways to write padding ---------- -->
+<section class="slide story" data-part="css" data-title="Shorthand: say it once">
+  <p class="kicker">Short ways to write it · 1</p>
+  <h2>Same on all 4 sides? Say it once!</h2>
+  <div class="body">
+    <div class="row" style="align-items:center;gap:18px">
+      <script type="text/x-code" style="flex:1" data-lang="css" data-fs="19" data-file="style.css · last class">
+#box1 {
+    padding-left: 40px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    padding-right: 40px;
+}
+      </script>
+      <span class="big-arr">→</span>
+      <div class="frag" data-step="1" style="width:250px;flex:none;display:flex;flex-direction:column">
+        <script type="text/x-code" data-lang="css" data-fs="19" data-file="style.css · today">
+#box1 {
+    padding: 40px;
+}
+        </script>
+      </div>
+      <div class="sc-four"><div class="gb"><i class="band bt">40px</i><i class="band bb">40px</i><i class="band bl">40px</i><i class="band br">40px</i><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div></div>
+    </div>
+    <p class="say frag" data-step="1">4 lines → 1 line. The box looks <b>exactly the same</b>.</p>
+    <p class="say frag" data-step="2"><code>margin</code> works the same way: <code>margin: 40px;</code></p>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="Shorthand: two numbers">
+  <p class="kicker">Short ways to write it · 2</p>
+  <h2>Two numbers? Up-down first, then left-right</h2>
+  <div class="body">
+    <div class="row fill" style="align-items:center;gap:40px">
+      <div class="st-real" style="width:560px;height:340px;flex:none"><div class="gb sc-two"><i class="band bt">20px</i><i class="band bb">20px</i><i class="band bl">60px</i><i class="band br">60px</i><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div></div>
+      <div class="col grow" style="gap:20px">
+        <div class="bigcode">padding: <span class="n1">20px</span> <span class="n2">60px</span>;</div>
+        <p class="say frag" data-step="1"><b class="w-n1">1st number</b> → top and bottom ↕</p>
+        <p class="say frag" data-step="2"><b class="w-n2">2nd number</b> → left and right ↔</p>
+        <p class="say small muted frag" data-step="3">Our menu links will use <code>padding: 6px 14px;</code></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="Shorthand: four numbers">
+  <p class="kicker">Short ways to write it · 3</p>
+  <h2>Four numbers? Go round like a clock</h2>
+  <div class="body">
+    <div class="row fill" style="align-items:center;gap:40px">
+      <div class="clock">
+        <div class="clock-face"></div>
+        <span class="clock-n c12">12</span><span class="clock-n c3">3</span><span class="clock-n c6">6</span><span class="clock-n c9">9</span>
+        <i class="clock-hand"></i>
+        <div class="gb sc-clock"><i class="band bt">20px</i><i class="band br">40px</i><i class="band bb">60px</i><i class="band bl">80px</i><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div>
+      </div>
+      <div class="col grow" style="gap:14px">
+        <div class="bigcode">padding: <span class="k1">20px</span> <span class="k2">40px</span> <span class="k3">60px</span> <span class="k4">80px</span>;</div>
+        <p class="say frag" data-step="1"><b class="w-k1">① 20px</b> → top</p>
+        <p class="say frag" data-step="2"><b class="w-k2">② 40px</b> → right</p>
+        <p class="say frag" data-step="3"><b class="w-k3">③ 60px</b> → bottom</p>
+        <p class="say frag" data-step="4"><b class="w-k4">④ 80px</b> → left</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Shorthand decoder">
+  <p class="kicker">Your turn · shorthand decoder</p>
+  <h2>Type the numbers: which side gets what?</h2>
+  <div class="body">
+    <div class="shd">
+      <div class="col" style="gap:14px">
+        <div class="shd-in"><span class="t-prop">padding</span><span class="t-pun">:</span><input type="text" value="6px 14px" spellcheck="false" autocomplete="off" aria-label="padding values"><span class="t-pun">;</span></div>
+        <div class="chips">
+          <button type="button" class="chipb" data-v="20px">20px</button>
+          <button type="button" class="chipb" data-v="6px 14px">6px 14px</button>
+          <button type="button" class="chipb" data-v="10px 20px 30px">10px 20px 30px</button>
+          <button type="button" class="chipb" data-v="10px 20px 30px 40px">10px 20px 30px 40px</button>
+          <button type="button" class="chipb" data-v="0 30px">0 30px</button>
+        </div>
+        <div class="card tight shd-rule small"></div>
+        <table class="tt compact">
+          <thead><tr><th>Top</th><th>Right</th><th>Bottom</th><th>Left</th></tr></thead>
+          <tbody><tr><td class="shd-o" data-s="t"></td><td class="shd-o" data-s="r"></td><td class="shd-o" data-s="b"></td><td class="shd-o" data-s="l"></td></tr></tbody>
+        </table>
+        <p class="xs muted">The stuffing is drawn 2&times; bigger, so small numbers are easy to see. Press <kbd>Esc</kbd> to leave the text box.</p>
+      </div>
+      <div class="shd-view">
+        <div class="shd-box">
+          <span class="shd-v shd-t"></span><span class="shd-v shd-r"></span><span class="shd-v shd-b"></span><span class="shd-v shd-l"></span>
+          <div class="shd-c"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- the browser's gap ---------- -->
+<section class="slide story" data-part="css" data-title="The browser's gap">
+  <p class="kicker">margin: 0</p>
+  <h2>The browser adds a little gap around your page</h2>
+  <div class="body">
+    <div class="row fill" style="align-items:center;gap:36px">
+      <div class="bgap">
+        <div class="bgap-bar"><span class="dots"><i></i><i></i><i></i></span><span class="bgap-url">index.html</span></div>
+        <div class="bgap-page"><div class="bgap-head">Ranjit Shrestha</div><p class="bgap-text">Welcome to my portfolio!</p></div>
+      </div>
+      <div class="col grow" style="gap:20px">
+        <p class="say">See the <b class="w-m">cream edge</b> around the blue bar? The browser put it there.</p>
+        <code class="cchip frag" data-step="1" style="align-self:flex-start">body { margin: 0; }</code>
+        <p class="say good frag" data-step="1">Gone! Now the bar touches the edges.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Try it: the browser's gaps">
+  <p class="kicker">Your turn · margin</p>
+  <h2>Try it: switch the gaps back on</h2>
+  <div class="body">
+    <div class="row fill">
+      <div class="col grow">
+        <div class="live" data-show="css" data-split="1fr 1fr" data-fs="19" data-zoom="1" data-url="index.html">
+          <script type="text/x-html">
+<div id="header">
+    <p class="logo">Ranjit Shrestha</p>
+</div>
+<p>Welcome to my portfolio!</p>
+          </script>
+          <script type="text/x-css">
+body {
+    margin: 0;
+}
+#header {
+    padding: 20px;
+    background-color: #1e3a8a;
+    color: #ffffff;
+}
+.logo {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+          </script>
+        </div>
+        <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    margin: 0;" data-to="    /* margin: 0; */">Remove margin: 0 from body</button><button type="button" class="try" data-from="    margin-top: 0;\n    margin-bottom: 0;" data-to="    /* margin-top: 0;\n    margin-bottom: 0; */">Remove the .logo margins</button></div>
+      </div>
+      <div class="col" style="width:330px;flex:none;gap:12px">
+        <div class="card tight small"><code>body { margin: 0; }</code><br>removes the gap around the page</div>
+        <div class="card tight small"><code>margin-top: 0;</code><br>removes the gap above a <code>&lt;p&gt;</code> or a heading</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- putting things in the middle ---------- -->
+<section class="slide story" data-part="css" data-title="Box in the middle">
+  <p class="kicker">In the middle · 1</p>
+  <h2>Put the box in the middle of the shelf</h2>
+  <div class="body">
+    <div class="shelf">
+      <span class="sh-auto sh-l">auto</span><span class="sh-auto sh-r">auto</span>
+      <div class="gb sh-box"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div>
+    </div>
+    <code class="cchip frag" data-step="1" style="align-self:center">margin-left: auto; margin-right: auto;</code>
+    <p class="say frag" data-step="1" style="text-align:center"><b class="w-m">auto</b> = share the empty space <b>equally</b> on both sides.</p>
+    <p class="say small muted frag" data-step="2" style="text-align:center">The box must be thinner than the shelf (<code>max-width</code>), or there is no space to share.</p>
+  </div>
+</section>
+
+<section class="slide story" data-part="css" data-title="Teddy in the middle">
+  <p class="kicker">In the middle · 2</p>
+  <h2>Move teddy to the middle of his box</h2>
+  <div class="body">
+    <div class="gb tb-box"><div class="gc tb-teddy"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div>
+    <code class="cchip frag" data-step="1" style="align-self:center">text-align: center;</code>
+    <p class="say frag" data-step="1" style="text-align:center"><code>text-align</code> moves what is <b>inside</b> the box: words, pictures… teddies!</p>
+    <p class="say small frag" data-step="2" style="text-align:center"><code>margin: auto</code> moves the <b>box</b>. &nbsp;·&nbsp; <code>text-align</code> moves what is <b>inside</b>.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Try it: two kinds of centring">
+  <p class="kicker">Your turn · in the middle</p>
+  <h2>Try it: break the centring</h2>
+  <div class="body">
+    <div class="row fill">
+      <div class="col grow">
+        <div class="live" data-show="css" data-split="1fr 1fr" data-fs="19" data-zoom="0.9" data-url="index.html">
+          <script type="text/x-html">
+<p class="intro">
+    I am a BCA student from Kathmandu.
+    I enjoy making simple, friendly web pages.
+</p>
+          </script>
+          <script type="text/x-css">
+.intro {
+    max-width: 260px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    padding: 10px;
+    background-color: #fff3c4;
+}
+          </script>
+        </div>
+        <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    margin-left: auto;\n    margin-right: auto;" data-to="    /* margin-left: auto;\n    margin-right: auto; */">Remove the auto margins</button><button type="button" class="try" data-from="    text-align: center;" data-to="    /* text-align: center; */">Remove text-align</button></div>
+      </div>
+      <div class="col" style="width:330px;flex:none;gap:12px">
+        <div class="card tight small"><code>margin: auto</code><br>moves the yellow <b>box</b></div>
+        <div class="card tight small"><code>text-align: center</code><br>moves the <b>words</b> inside it</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- display ---------- -->
+<section class="slide story" data-part="css" data-title="How boxes sit on the shelf">
+  <p class="kicker">display</p>
+  <h2>How do boxes sit on the shelf?</h2>
+  <div class="body" style="gap:12px">
+    <div class="dsh frag" data-step="1">
+      <div class="dsh-lab"><b>block</b><span>Each one takes a <b>whole row</b></span></div>
+      <div class="dsh-demo"><div class="dbk">box 1</div><div class="dbk">box 2</div><div class="dbk">box 3</div></div>
+    </div>
+    <div class="dsh frag" data-step="2">
+      <div class="dsh-lab"><b>inline</b><span>Sits in the line, like <b>words</b>. No size.</span></div>
+      <div class="dsh-demo dsh-text">I like <span class="din">HTML</span> and <span class="din">CSS</span> a lot. <span class="dno">height: 60px → ignored ✗</span></div>
+    </div>
+    <div class="dsh frag" data-step="3">
+      <div class="dsh-lab"><b>inline-block</b><span>Side by side <b>and</b> keeps its size</span></div>
+      <div class="dsh-demo"><span class="dib" style="width:90px;height:44px">1</span><span class="dib" style="width:130px;height:72px">2</span><span class="dib" style="width:70px;height:56px">3</span></div>
+    </div>
+    <p class="say small frag" data-step="4">Links are <b>inline</b>. Our menu links and buttons use <code>display: inline-block;</code></p>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Try it: switch the display">
+  <p class="kicker">Your turn · display</p>
+  <h2>Click a <code>display</code> value and watch the links</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-split="1fr 1.15fr" data-fs="16" data-zoom="1" data-url="index.html">
+      <script type="text/x-html">
+<div id="header">
+    <p>Ranjit Shrestha</p>
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+</div>
+<p>The next paragraph.</p>
+      </script>
+      <script type="text/x-css">
+#header {
+    padding: 10px;
+    background-color: #1e3a8a;
+    color: #ffffff;
+}
+#header a {
+    display: inline-block;
+    width: 110px;
+    margin-top: 20px;
+    padding: 6px 14px;
+    background-color: #c2410c;
+    color: #ffffff;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Try</span><span class="seg" data-prop="display"><button type="button" class="try" data-val="inline">inline</button><button type="button" class="try" data-val="inline-block">inline-block</button><button type="button" class="try" data-val="block">block</button></span></div>
+    <div class="tip small"><b>block</b> = a whole row each · <b>inline</b> = like words: width and top margin ignored · <b>inline-block</b> = side by side <i>and</i> keeps its size</div>
+  </div>
+</section>
+
+<!-- ---------- selectors: boxes inside boxes ---------- -->
+<section class="slide story" data-part="css" data-title="Boxes inside boxes">
+  <p class="kicker">Selectors · space vs &gt;</p>
+  <h2>Boxes inside boxes</h2>
+  <div class="body">
+    <div class="row fill" style="align-items:center;gap:40px">
+      <div class="nb-big sc-nest"><span class="nb-lab">#box</span>
+        <div class="nt nt-a"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg><span class="nt-lab">a</span></div>
+        <div class="nb-small"><span class="nb-lab">p</span>
+          <div class="nt nt-b"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg><span class="nt-lab">a</span></div>
+        </div>
+      </div>
+      <div class="col grow" style="gap:16px">
+        <p class="say">A big box holds a teddy, and a small box with another teddy.</p>
+        <code class="cchip frag" data-step="1" style="align-self:flex-start">#box a</code>
+        <p class="say frag" data-step="1">A <b>space</b> = every teddy inside, even inside the small box.</p>
+        <code class="cchip frag" data-step="2" style="align-self:flex-start">#box &gt; a</code>
+        <p class="say frag" data-step="2"><b>&gt;</b> = only the teddy <b>directly</b> inside the big box.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Selectors: try it">
+  <p class="kicker">Your turn · selectors</p>
+  <h2>Which links does the selector find?</h2>
+  <div class="body">
+    <div class="selt" data-zoom="1">
+      <div class="col" style="gap:12px">
+        <script type="text/x-code" data-lang="html" data-fs="16" data-file="index.html">
+<div id="header">
+    <p class="logo">Ranjit</p>
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+</div>
+
+<div id="footer">
+    <p>
+        <a href="#github">GitHub</a> ·
+        <a href="#header">Back to top</a>
+    </p>
+</div>
+        </script>
+        <div class="card tight small"><code>#header a</code> = every <code>&lt;a&gt;</code> <b>inside</b> #header<br><code>#header &gt; a</code> = only <b>directly</b> inside<br><span class="xs muted">Press <kbd>Esc</kbd> to leave the text box.</span></div>
+      </div>
+      <div class="col" style="gap:12px;min-height:0">
+        <div class="shd-in selt-in"><input type="text" value="#header a" spellcheck="false" autocomplete="off" aria-label="CSS selector"><span class="t-pun">{ }</span></div>
+        <div class="chips">
+          <button type="button" class="chipb" data-v="#header a">#header a</button>
+          <button type="button" class="chipb" data-v="#header > a">#header &gt; a</button>
+          <button type="button" class="chipb" data-v="#footer a">#footer a</button>
+          <button type="button" class="chipb" data-v="#footer > a">#footer &gt; a</button>
+        </div>
+        <div class="selt-res"></div>
+        <div class="selt-view"></div>
+        <script type="text/x-html">
+<div id="header">
+    <p class="logo">Ranjit</p>
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#contact">Contact</a>
+</div>
+
+<div id="footer">
+    <p>
+        <a href="#github">GitHub</a> ·
+        <a href="#header">Back to top</a>
+    </p>
+</div>
+        </script>
+        <script type="text/x-css">
+body { margin: 0; font-family: Arial, sans-serif; }
+#header { background-color: #1e3a8a; color: #ffffff; padding: 14px 20px; }
+#header p { margin: 0 0 6px; font-weight: bold; letter-spacing: 2px; }
+#header a { color: #ffffff; margin-right: 14px; }
+#footer { background-color: #333333; color: #ffffff; padding: 14px 20px; margin-top: 24px; }
+#footer a { color: #fdba74; }
+a { padding: 2px 4px; border-radius: 4px; }
+        </script>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="DevTools: x-ray glasses">
+  <p class="kicker">X-ray glasses</p>
+  <h2>DevTools shows you every box</h2>
+  <div class="body">
+    <div class="row fill" style="align-items:center;gap:30px">
+      <div class="dtbm" aria-hidden="true">
+        <div class="dt-m"><span class="dt-l">margin</span><span class="dt-n dt-t">30</span><span class="dt-n dt-r">30</span><span class="dt-n dt-bo">30</span><span class="dt-n dt-le">30</span>
+          <div class="dt-b"><span class="dt-l">border</span><span class="dt-n dt-t">4</span><span class="dt-n dt-r">4</span><span class="dt-n dt-bo">4</span><span class="dt-n dt-le">4</span>
+            <div class="dt-p"><span class="dt-l">padding</span><span class="dt-n dt-t">20</span><span class="dt-n dt-r">20</span><span class="dt-n dt-bo">20</span><span class="dt-n dt-le">20</span>
+              <div class="dt-c">500 × 26</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ol class="steps small grow">
+        <li><div>Right-click any box → <b>Inspect</b></div></li>
+        <li><div>Open the <b>Computed</b> tab: you see this picture, with the real numbers</div></li>
+        <li><div>Same colours as teddy's box: <b class="k-m">margin</b>, <b class="k-p">padding</b>, <b class="k-c">content</b></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- quick checks ---------- -->
+<section class="slide" data-part="css" data-title="Quick check 1 · the stuffing" data-section="Quick check">
+  <p class="kicker">Quick check · 1 / 4</p>
+  <h2>The soft stuffing in teddy's box is called…</h2>
+  <div class="body">
+    <div class="row fill" style="align-items:center;gap:30px">
+      <div class="sc-q1"><div class="gm"><div class="gb"><div class="gc"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg></div></div></div></div>
+      <div class="col grow" style="gap:14px">
+        <div class="opts">
+          <div class="opt"><span class="letter">A</span>content</div>
+          <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>padding</div>
+          <div class="opt"><span class="letter">C</span>border</div>
+          <div class="opt"><span class="letter">D</span>margin</div>
+        </div>
+        <div class="explain frag" data-step="1"><span class="ok-badge">B</span><span><b class="w-p">Padding</b> = the space <b>inside</b> the wall, around the content.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Quick check 2 · two numbers">
+  <p class="kicker">Quick check · 2 / 4</p>
+  <h2><code>padding: 10px 20px;</code><br>How much padding is on the <u>left</u>?</h2>
+  <div class="body">
+    <div class="opts">
+      <div class="opt"><span class="letter">A</span>10px</div>
+      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>20px</div>
+      <div class="opt"><span class="letter">C</span>30px</div>
+      <div class="opt"><span class="letter">D</span>0px</div>
+    </div>
+    <div class="explain frag" data-step="1"><span class="ok-badge">B</span><span>1st number → top &amp; bottom ↕ · 2nd number → left &amp; right ↔</span></div>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Quick check 3 · margin on a link">
+  <p class="kicker">Quick check · 3 / 4</p>
+  <h2>A link has <code>margin-top: 30px;</code> but it does not move. Why?</h2>
+  <div class="body">
+    <div class="opts">
+      <div class="opt"><span class="letter">A</span>Links can never have a margin</div>
+      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>A link is <b>inline</b>: add <code>display: inline-block</code></div>
+      <div class="opt"><span class="letter">C</span>30px is too small to see</div>
+      <div class="opt"><span class="letter">D</span>It needs <code>text-align: center</code></div>
+    </div>
+    <div class="explain frag" data-step="1"><span class="ok-badge">B</span><span>Inline things sit in the line like words, so they ignore top margin. <code>inline-block</code> fixes it.</span></div>
+  </div>
+</section>
+
+<section class="slide" data-part="css" data-title="Quick check 4 · space vs >">
+  <p class="kicker">Quick check · 4 / 4</p>
+  <h2>Does <code>#box &gt; a</code> find the teddy in the <u>small</u> box?</h2>
+  <div class="body">
+    <div class="row fill" style="align-items:center;gap:30px">
+      <div class="nb-big nb-mini"><span class="nb-lab">#box</span>
+        <div class="nt nt-a"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg><span class="nt-lab">a</span></div>
+        <div class="nb-small"><span class="nb-lab">p</span>
+          <div class="nt nt-b nt-ask"><svg class="teddy" viewBox="0 0 100 100" aria-hidden="true"><use href="#teddy"/></svg><span class="nt-lab">a</span></div>
+        </div>
+      </div>
+      <div class="col grow" style="gap:14px">
+        <div class="opts">
+          <div class="opt"><span class="letter">A</span>Yes, it is inside #box</div>
+          <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>No, it is inside the <code>p</code></div>
+          <div class="opt"><span class="letter">C</span>Only on hover</div>
+          <div class="opt"><span class="letter">D</span>Only with a class</div>
+        </div>
+        <div class="explain frag" data-step="1"><span class="ok-badge">B</span><span><code>&gt;</code> = <b>directly</b> inside. Use <code>#box a</code> to find both.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide s-break" data-title="Break" data-section="Break">
+  <p class="kicker">Break time ☕</p>
+  <div class="countdown" data-min="5">
+    <div class="cd-time">5:00</div>
+    <div class="cd-btns"><button type="button" class="primary cd-start">Start</button><button type="button" class="cd-add">+1 min</button><button type="button" class="cd-reset">Reset</button></div>
+  </div>
+  <p class="lead" style="margin-top:26px">Stretch, drink some water, and get a <b>square photo</b> of yourself ready.<br><b>After the break: we build your portfolio! 🛠️</b></p>
+</section>
+
+
+<!-- =========================================================
+     PART 2 · BUILD YOUR PORTFOLIO
+     ========================================================= -->
+<section class="slide s-divider" data-part="build" data-title="Part 2 · Build your portfolio" data-section="Code-along" data-nofoot>
+  <div class="div-num" aria-hidden="true">02</div>
+  <p class="kicker">Part 2</p>
+  <h1>Build your portfolio</h1>
+  <p class="sub">From the header to the footer, one box at a time</p>
+  <div class="journey">
+    <span>Setup</span><span class="arr">→</span><span>Header</span><span class="arr">→</span><span>Hero</span><span class="arr">→</span><span>Sections</span><span class="arr">→</span><span>About</span><span class="arr">→</span><span>Skills</span><span class="arr">→</span><span>Projects</span><span class="arr">→</span><span>Education</span><span class="arr">→</span><span>Contact</span><span class="arr">→</span><span>Footer</span>
+  </div>
+</section>
+
+<section class="slide" data-part="build" data-title="Setup">
+  <p class="kicker">Code-along · Step 0</p>
+  <h2>Set up your portfolio folder</h2>
+  <div class="body">
+    <div class="row fill">
+      <div class="col" style="width:400px;flex:none">
+        <div class="tree">
+          <div class="d">📁 portfolio</div>
+          <div class="i1">📄 index.html</div>
+          <div class="i1 d">📁 css</div>
+          <div class="i2"><span class="new">🎨 style.css</span></div>
+          <div class="i1 d">📁 images</div>
+          <div class="i2">🖼️ me.jpg <span class="xs muted">(a square photo)</span></div>
+        </div>
+        <div class="card tight">
+          <h3 style="font-size:19px">Our 4 colours</h3>
+          <div class="pal">
+            <span><i class="sw" style="background:#1e3a8a"></i><code>#1e3a8a</code> dark blue</span>
+            <span><i class="sw" style="background:#c2410c"></i><code>#c2410c</code> orange</span>
+            <span><i class="sw" style="background:#fdf6ec"></i><code>#fdf6ec</code> cream</span>
+            <span><i class="sw" style="background:#333333"></i><code>#333333</code> dark grey</span>
+          </div>
+        </div>
+      </div>
+      <div class="grow col">
+        <ol class="steps small">
+          <li><div>In <code>index.html</code>, type <code>!</code> + <kbd>Tab</kbd> for the page skeleton</div></li>
+          <li><div>Link the CSS. It is inside the <code>css</code> folder now:</div></li>
+        </ol>
+        <script type="text/x-code" data-lang="html" data-fs="17" data-hl="4" data-file="index.html">
+<head>
+    <meta charset="UTF-8">
+    ...
+    <link rel="stylesheet" href="css/style.css">
+    <title>Ranjit Shrestha | Portfolio</title>
+</head>
+        </script>
+        <ol class="steps small" style="counter-reset:st 2">
+          <li><div>Test it: <code>body { background-color: yellow; }</code>. Yellow page? Connected! Now delete the test rule.</div></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" data-part="build" data-title="Header · HTML">
+  <p class="kicker">Type the HTML · Header</p>
+  <h2>The header: your name and a menu</h2>
+  <div class="body">
+    <div class="row fill">
+      <script type="text/x-code" style="flex:1" data-lang="html" data-fs="16" data-file="index.html">
+<div id="header">
+    <p class="logo">Ranjit Shrestha</p>
+
+    <!-- href="#about" jumps to id="about" -->
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Projects</a>
+    <a href="#education">Education</a>
+    <a href="#contact">Contact</a>
+</div>
+      </script>
+      <div class="col" style="width:380px;flex:none;gap:12px">
+        <div class="card tight small"><code>&lt;div&gt;</code> = an empty box. It groups things, so CSS can style them together.</div>
+        <div class="card tight small"><code>href="#about"</code> jumps to the element with <code>id="about"</code> on the <b>same page</b>. The links start working once the sections exist.</div>
+        <div class="tip small">Write <b>your own</b> name!</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 1 · Page basics" data-section="Code-along">
+  <p class="kicker">Code-along · STEP 1 · Page basics</p>
+  <h2>Page basics: the whole page at once</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="header" data-pfstep="1" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html">
+      <script type="text/x-css">
+* {
+    box-sizing: border-box;
+}
+html {
+    scroll-behavior: smooth;
+}
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333333;
+    background-color: #fdf6ec;
+}
+      </script>
+    </div>
+    <div class="tip"><code>*</code> = every element: every box is <code>border-box</code>, like teddy's 200px box in Part 1. <code>scroll-behavior: smooth</code> makes menu links glide.</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 1 · Headings &amp; links">
+  <p class="kicker">Code-along · STEP 1 · Page basics</p>
+  <h2>Headings &amp; links <span class="muted">(you know this from Lesson 01!)</span></h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="header" data-pfstep="1" data-split="1.25fr 1fr" data-fs="16" data-zoom="0.75" data-url="index.html">
+      <script type="text/x-css">
+h1, h2, h3 {
+    font-family: Georgia, "Times New Roman", serif;
+    line-height: 1.3;
+}
+a {
+    color: #c2410c;
+    font-weight: bold;
+    text-decoration: none;
+}
+/* :hover = only while the mouse is over it */
+a:hover {
+    text-decoration: underline;
+}
+      </script>
+    </div>
+    <div class="tip">One rule for three headings: separate the selectors with <b>commas</b>.</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 2 · Header bar &amp; name">
+  <p class="kicker">Code-along · STEP 2 · Header &amp; menu</p>
+  <h2>A blue header bar with your name</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="header" data-pfstep="2" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html">
+      <script type="text/x-css">
+#header {
+    padding: 20px;
+    background-color: #1e3a8a;
+    text-align: center;
+}
+.logo {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #ffffff;
+    font-family: Georgia, serif;
+    font-size: 26px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-add="body { margin: 8px; }">Put the browser's 8px gap back</button><button type="button" class="try" data-from="    margin-top: 0;" data-to="    /* margin-top: 0; */">Remove margin-top: 0</button></div>
+    <div class="tip">A <code>&lt;p&gt;</code> has a margin, so <code>margin-top: 0</code> removes the gap above the name. <code>letter-spacing</code> = space between the letters.</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 2 · Menu links">
+  <p class="kicker">Code-along · STEP 2 · Header &amp; menu</p>
+  <h2>Menu links that look like buttons</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="header" data-pfstep="2" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html">
+      <script type="text/x-css">
+/* space = inside: every <a> in #header */
+#header a {
+    display: inline-block;
+    padding: 6px 14px;
+    color: #ffffff;
+    border-radius: 20px;
+}
+#header a:hover {
+    background-color: #c2410c;
+    text-decoration: none;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    border-radius: 20px;\n}" data-to="    border-radius: 20px;\n    margin-top: 20px;\n}">① Add margin-top: 20px</button><button type="button" class="try" data-from="display: inline-block;" data-to="display: inline;">② Change to display: inline</button></div>
+    <div class="tip"><code>#header a</code> beats <code>a</code> (an id is more specific), so the links are white. <code>inline-block</code> lets a link use padding and margin like a box.</div>
+  </div>
+</section>
+<section class="slide" data-part="build" data-title="Hero · HTML">
+  <p class="kicker">Type the HTML · Hero</p>
+  <h2>The hero: the first thing visitors see</h2>
+  <div class="body">
+    <div class="row fill">
+      <script type="text/x-code" style="flex:1" data-lang="html" data-fs="15" data-file="index.html">
+<div id="hero">
+    <img src="images/me.jpg" alt="My photo" class="profile-photo">
+
+    <p class="greeting">Namaste, I am</p>
+    <h1>Ranjit Shrestha</h1>
+    <p class="tagline">BCA Student &amp; Aspiring Web Developer</p>
+
+    <p class="intro">
+        I am a first-semester BCA student from Kathmandu. I enjoy
+        turning ideas into simple, friendly web pages.
+    </p>
+
+    <a href="#projects" class="button">See My Projects</a>
+    <a href="#contact" class="button-outline">Contact Me</a>
+</div>
+      </script>
+      <div class="col" style="width:380px;flex:none;gap:12px">
+        <div class="card tight small"><b>New: HTML entities.</b> <code>&amp;</code> starts a special code, so to show "&amp;" you write <code>&amp;amp;</code>.<table class="ent"><tr><td><code>&amp;amp;</code></td><td>&amp;</td><td><code>&amp;rarr;</code></td><td>&rarr;</td></tr><tr><td><code>&amp;copy;</code></td><td>&copy;</td><td><code>&amp;ndash;</code></td><td>&ndash;</td></tr><tr><td><code>&amp;middot;</code></td><td>&middot;</td><td><code>&amp;uarr;</code></td><td>&uarr;</td></tr></table></div>
+        <div class="tip small">Use a <b>square</b> photo, or the circle becomes an oval.</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 3 · Hero box &amp; round photo">
+  <p class="kicker">Code-along · STEP 3 · Hero</p>
+  <h2>The hero box and a round photo</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="hero" data-pfstep="3" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html">
+      <script type="text/x-css">
+#hero {
+    padding: 50px 20px;
+    background-color: #ffffff;
+    text-align: center;
+    border-bottom: 4px solid #c2410c;
+}
+/* same width & height + 50% = a circle */
+.profile-photo {
+    width: 180px;
+    height: 180px;
+    border: 6px solid #c2410c;
+    border-radius: 50%;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="height: 180px;" data-to="height: 120px;">Make the photo 120px tall</button></div>
+    <div class="tip">The photo is centred by <code>text-align: center</code>: an <code>&lt;img&gt;</code> sits in the line, like text.</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 3 · Greeting &amp; name">
+  <p class="kicker">Code-along · STEP 3 · Hero</p>
+  <h2>The greeting and your big name</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="hero" data-pfstep="3" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to=".profile-photo">
+      <script type="text/x-css">
+.greeting {
+    margin-bottom: 0;
+    color: #c2410c;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+h1 {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    color: #1e3a8a;
+    font-size: 48px;
+}
+      </script>
+    </div>
+    <div class="tip">Only <b>one</b> <code>&lt;h1&gt;</code> per page, and ours lives in the hero.</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 3 · Tagline &amp; intro">
+  <p class="kicker">Code-along · STEP 3 · Hero</p>
+  <h2>Tagline and intro: centre the <span class="accent">box</span></h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="hero" data-pfstep="3" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to=".greeting">
+      <script type="text/x-css">
+.tagline {
+    margin-top: 0;
+    color: #555555;
+    font-size: 20px;
+    font-style: italic;
+}
+/* auto margins = the box in the middle */
+.intro {
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    font-size: 18px;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    margin-left: auto;\n    margin-right: auto;" data-to="    /* margin-left: auto;\n    margin-right: auto; */">Remove the auto margins</button></div>
+    <div class="tip"><code>text-align: center</code> centres the <b>words</b>. <code>max-width</code> + auto margins centre the <b>box</b>.</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 3 · Buttons">
+  <p class="kicker">Code-along · STEP 3 · Hero</p>
+  <h2>Two buttons: shared styles first</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="hero" data-pfstep="3" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to=".intro">
+      <script type="text/x-css">
+.button, .button-outline {
+    display: inline-block;
+    margin: 5px;
+    padding: 12px 26px;
+    border: 2px solid #c2410c;
+    border-radius: 30px;
+}
+.button {
+    background-color: #c2410c;
+    color: #ffffff;
+}
+.button-outline {
+    background-color: #ffffff;
+    color: #c2410c;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from=".button, .button-outline {" data-to=".button .button-outline {">Use a space instead of the comma</button></div>
+    <div class="tip">A <b>comma</b> means "and". Both buttons share the first rule, then each one gets its own colours.</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 3 · Button hover">
+  <p class="kicker">Code-along · STEP 3 · Hero</p>
+  <h2>Hover: both buttons turn blue</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="hero" data-pfstep="3" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to=".intro">
+      <script type="text/x-css">
+.button:hover, .button-outline:hover {
+    background-color: #1e3a8a;
+    border-color: #1e3a8a;
+    color: #ffffff;
+    text-decoration: none;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    text-decoration: none;" data-to="    /* text-decoration: none; */">Remove text-decoration: none</button></div>
+    <div class="tip"><code>border-color</code> changes only the colour of the border. <code>.button:hover</code> beats <code>a:hover</code>, so the buttons are not underlined. Hover them!</div>
+  </div>
+</section>
+<section class="slide" data-part="build" data-title="Sections · HTML">
+  <p class="kicker">Type the HTML · Sections</p>
+  <h2>Five empty boxes for the five sections</h2>
+  <div class="body">
+    <div class="row fill">
+      <script type="text/x-code" style="flex:1" data-lang="html" data-fs="16" data-file="index.html">
+<!-- everything below sits inside this box -->
+<div class="page">
+
+    <div id="about" class="section"><h2>About Me</h2></div>
+    <div id="skills" class="section"><h2>My Skills</h2></div>
+    <div id="projects" class="section"><h2>My Projects</h2></div>
+    <div id="education" class="section"><h2>Education</h2></div>
+    <div id="contact" class="section"><h2>Contact Me</h2></div>
+
+</div>
+      </script>
+      <div class="col" style="width:380px;flex:none;gap:12px">
+        <div class="card tight small"><b>One element, an id and a class.</b><br><code>id</code> = the menu link's target (like your <b>roll number</b>: only one).<br><code>class</code> = the shared look (like your <b>batch</b>: many share it).</div>
+        <div class="tip small">Now the menu works! We fill each box in the next steps.</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 4 · Page column &amp; boxes">
+  <p class="kicker">Code-along · STEP 4 · Section boxes</p>
+  <h2>A column in the middle, white boxes inside</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="shells" data-pfstep="4" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.6" data-url="index.html" data-scroll-to="#about">
+      <script type="text/x-css">
+.page {
+    max-width: 860px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 30px 16px;
+}
+/* one class, five sections */
+.section {
+    margin-bottom: 30px;
+    padding: 30px;
+    background-color: #ffffff;
+    border: 1px solid #eadfcc;
+    border-radius: 12px;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    max-width: 860px;" data-to="    /* max-width: 860px; */">Remove max-width</button><button type="button" class="try" data-from="    padding: 30px;" data-to="    /* padding: 30px; */">Remove the padding</button></div>
+    <div class="tip">The same centring trick as <code>.intro</code>, for the whole column. <code>max-width</code> = "never wider than".</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 4 · Section headings">
+  <p class="kicker">Code-along · STEP 4 · Section boxes</p>
+  <h2>Headings with an orange line</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="shells" data-pfstep="4" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#about">
+      <script type="text/x-css">
+h2 {
+    margin-top: 0;
+    padding-bottom: 8px;
+    color: #1e3a8a;
+    font-size: 30px;
+    border-bottom: 3px solid #c2410c;
+}
+h3 {
+    color: #c2410c;
+    font-size: 20px;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    margin-top: 0;" data-to="    /* margin-top: 0; */">Remove margin-top: 0</button></div>
+    <div class="tip"><code>padding-bottom</code> pushes the line away from the words. Scroll the preview to the top and click a menu link: it glides!</div>
+  </div>
+</section>
+<section class="slide" data-part="build" data-title="About · HTML">
+  <p class="kicker">Type the HTML · About</p>
+  <h2>Fill the About box</h2>
+  <div class="body">
+    <div class="row fill">
+      <script type="text/x-code" style="flex:1" data-lang="html" data-fs="15" data-file="index.html">
+<div id="about" class="section">
+    <h2>About Me</h2>
+    <p>Hi! I am <strong>Ranjit</strong>, a BCA student ...</p>
+    <p>My favourite book is <em>The Alchemist</em>.</p>
+
+    <p class="highlight">
+        <strong>My goal:</strong> to become a skilled web developer.
+    </p>
+
+    <h3>Quick Facts</h3>
+    <ul class="facts">
+        <li><strong>Location:</strong> Kathmandu, Nepal</li>
+        <li><strong>Studying:</strong> BCA, First Semester</li>
+        <li><strong>Languages:</strong> Nepali, English, Hindi</li>
+        <li><strong>Hobbies:</strong> Football, reading, travelling</li>
+    </ul>
+</div>
+      </script>
+      <div class="col" style="width:380px;flex:none;gap:12px">
+        <div class="card tight small">Write about <b>yourself</b>: one or two short sentences per paragraph.</div>
+        <div class="card tight small"><code>class="highlight"</code> = our reminder box from Lesson 01.</div>
+        <div class="tip small">We will use <code>class="facts"</code> again in the Contact box.</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 5 · About">
+  <p class="kicker">Code-along · STEP 5 · About</p>
+  <h2>A reminder box and a list without bullets</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="about" data-pfstep="5" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#about">
+      <script type="text/x-css">
+.highlight {
+    padding: 12px 16px;
+    background-color: #fff3c4;
+    border-left: 6px solid #f59e0b;
+}
+.facts {
+    padding-left: 0;     /* remove the gap */
+    list-style: none;    /* no bullets */
+}
+.facts li {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed #eadfcc;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    padding-left: 0;" data-to="    /* padding-left: 0; */">Keep the 40px gap</button><button type="button" class="try" data-from="    list-style: none;" data-to="    /* list-style: none; */">Bring the bullets back</button></div>
+    <div class="tip">Every <code>&lt;ul&gt;</code> has a 40px left padding: that is where the bullets live. <code>.highlight</code> is our reminder box from Lesson 01!</div>
+  </div>
+</section>
+<section class="slide" data-part="build" data-title="Skills · HTML">
+  <p class="kicker">Type the HTML · Skills</p>
+  <h2>Two lists: what you know, what you are learning</h2>
+  <div class="body">
+    <div class="row fill">
+      <script type="text/x-code" style="flex:1" data-lang="html" data-fs="15" data-file="index.html">
+<div id="skills" class="section">
+    <h2>My Skills</h2>
+
+    <h3>I can use</h3>
+    <ul class="skill-list">
+        <li>HTML</li>
+        <li>CSS</li>
+        <li>C Programming</li>
+        <li>MS Word</li>
+        <li>MS Excel</li>
+        <li>Canva</li>
+    </ul>
+
+    <h3>I am learning</h3>
+    <ul class="learning-list">
+        <li>JavaScript</li>
+        <li>Git &amp; GitHub</li>
+        <li>Responsive Design</li>
+    </ul>
+</div>
+      </script>
+      <div class="col" style="width:380px;flex:none;gap:12px">
+        <div class="card tight small">Two lists, two classes: <code>skill-list</code> and <code>learning-list</code>.</div>
+        <div class="card tight small"><code>&amp;amp;</code> shows "&amp;" on the page.</div>
+        <div class="tip small">List <b>your</b> skills!</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 6 · Skill pills">
+  <p class="kicker">Code-along · STEP 6 · Skills</p>
+  <h2>List items side by side, like pills</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="skills" data-pfstep="6" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#skills">
+      <script type="text/x-css">
+.skill-list, .learning-list {
+    padding-left: 0;
+}
+/* inline-block = side by side */
+.skill-list li, .learning-list li {
+    display: inline-block;
+    margin: 4px;
+    padding: 6px 16px;
+    border: 2px solid #1e3a8a;
+    border-radius: 20px;
+    font-weight: bold;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Try</span><span class="seg" data-prop="display"><button type="button" class="try" data-val="inline-block">inline-block</button><button type="button" class="try" data-val="inline">inline</button><button type="button" class="try" data-val="block">block</button></span><span class="lab">Break it</span><button type="button" class="try" data-from=".skill-list li, .learning-list li {" data-to=".skill-list, .learning-list li {">Forget the first li</button></div>
+    <div class="tip">Switch the <code>display</code> and watch: <b>block</b> = own line, <b>inline</b> = no box rules, <b>inline-block</b> = side by side <i>and</i> a box.</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 6 · Two kinds of pills">
+  <p class="kicker">Code-along · STEP 6 · Skills</p>
+  <h2>Solid pills and dashed pills</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="skills" data-pfstep="6" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#skills">
+      <script type="text/x-css">
+.skill-list li {
+    background-color: #1e3a8a;
+    color: #ffffff;
+}
+.learning-list li {
+    background-color: #ffffff;
+    color: #1e3a8a;
+    border-style: dashed;  /* still learning */
+}
+      </script>
+    </div>
+    <div class="tip">STEP 6 said <code>solid</code>, but <code>border-style: dashed</code> comes later with the same specificity, so it wins.</div>
+  </div>
+</section>
+<section class="slide" data-part="build" data-title="Projects · HTML">
+  <p class="kicker">Type the HTML · Projects</p>
+  <h2>Project cards: one box per project</h2>
+  <div class="body">
+    <div class="row fill">
+      <script type="text/x-code" style="flex:1" data-lang="html" data-fs="15" data-file="index.html">
+<div id="projects" class="section">
+    <h2>My Projects</h2>
+    <p>A few things I have built while learning web development.</p>
+
+    <!-- one card: copy it for each project -->
+    <div class="card">
+        <h3>Student Profile Page</h3>
+        <p>
+            My very first web page, with headings, paragraphs,
+            a photo, lists and links.
+        </p>
+        <p class="built-with">Built with: HTML, CSS</p>
+        <a href="profile.html">View project &rarr;</a>
+    </div>
+
+    <!-- ...more cards... -->
+</div>
+      </script>
+      <div class="col" style="width:380px;flex:none;gap:12px">
+        <div class="card tight small">The <b>same class</b> on every card, so one CSS rule styles them all.</div>
+        <div class="card tight small">Link each card to <b>your own</b> page. Remember <code>../</code> = go up one folder.</div>
+        <div class="card tight small"><code>&amp;rarr;</code> shows &rarr;</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 7 · Project cards">
+  <p class="kicker">Code-along · STEP 7 · Projects</p>
+  <h2>Project cards with an orange stripe</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="projects" data-pfstep="7" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#projects">
+      <script type="text/x-css">
+.card {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #fdf6ec;
+    border: 2px solid #eadfcc;
+    border-left: 6px solid #c2410c;
+    border-radius: 8px;
+}
+/* hover works on any element */
+.card:hover {
+    border-color: #c2410c;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    border: 2px solid #eadfcc;\n    border-left: 6px solid #c2410c;" data-to="    border-left: 6px solid #c2410c;\n    border: 2px solid #eadfcc;">Put border-left first</button></div>
+    <div class="tip"><code>border</code> sets all four sides, so <code>border-left</code> must come <b>after</b> it. Hover a card!</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 7 · Card text">
+  <p class="kicker">Code-along · STEP 7 · Projects</p>
+  <h2>Card titles and "Built with"</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="projects" data-pfstep="7" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#projects .card">
+      <script type="text/x-css">
+.card h3 {
+    margin-top: 0;
+    color: #1e3a8a;
+}
+.built-with {
+    color: #777777;
+    font-size: 14px;
+    font-style: italic;
+}
+      </script>
+    </div>
+    <div class="tip"><code>.card h3</code> is more specific than <code>h3</code>, so card titles are blue and the About <code>h3</code> stays orange.</div>
+  </div>
+</section>
+<section class="slide" data-part="build" data-title="Education · HTML">
+  <p class="kicker">Type the HTML · Education</p>
+  <h2>Education: a table with heading cells</h2>
+  <div class="body">
+    <div class="row fill">
+      <script type="text/x-code" style="flex:1" data-lang="html" data-fs="15" data-file="index.html">
+<div id="education" class="section">
+    <h2>Education</h2>
+
+    <table>
+        <tr>
+            <th>Level</th>
+            <th>School / College</th>
+            <th>Years</th>
+        </tr>
+        <tr>
+            <td>BCA</td>
+            <td>Example College, Kathmandu</td>
+            <td>2026 &ndash; now</td>
+        </tr>
+        <!-- one more row for each school -->
+    </table>
+</div>
+      </script>
+      <div class="col" style="width:380px;flex:none;gap:12px">
+        <div class="card tight small"><b>New: <code>&lt;th&gt;</code></b> = a <b>heading cell</b>. Use it in the first row instead of <code>&lt;td&gt;</code>. It is bold and centred.</div>
+        <div class="card tight small"><code>&amp;ndash;</code> shows a dash: 2024 &ndash; 2026</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 8 · Education table">
+  <p class="kicker">Code-along · STEP 8 · Education</p>
+  <h2>A clean table</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="education" data-pfstep="8" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#education">
+      <script type="text/x-css">
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 10px;
+    border: 1px solid #dddddd;
+    text-align: left;
+}
+th {
+    background-color: #1e3a8a;
+    color: #ffffff;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    border-collapse: collapse;" data-to="    /* border-collapse: collapse; */">Remove border-collapse</button><button type="button" class="try" data-from="    width: 100%;" data-to="    /* width: 100%; */">Remove width: 100%</button></div>
+    <div class="tip"><code>width: 100%</code> = as wide as the box it is in. <code>border-collapse</code> joins the double borders (Lesson 01).</div>
+  </div>
+</section>
+<section class="slide" data-part="build" data-title="Contact · HTML">
+  <p class="kicker">Type the HTML · Contact</p>
+  <h2>Contact: your details and a message form</h2>
+  <div class="body">
+    <div class="row fill">
+      <script type="text/x-code" style="flex:1" data-lang="html" data-fs="15" data-file="index.html">
+<div id="contact" class="section">
+    <h2>Contact Me</h2>
+    <ul class="facts">
+        <li><strong>Email:</strong>
+            <a href="mailto:ranjit@example.com">ranjit@example.com</a></li>
+        <li><strong>Location:</strong> Kathmandu, Nepal</li>
+    </ul>
+
+    <form action="" method="GET">
+        <label for="name">Your Name</label>
+        <input type="text" id="name" name="name" required>
+        <!-- email (input) and subject (select): the same way -->
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="5"></textarea>
+        <button type="submit">Send Message</button>
+    </form>
+</div>
+      </script>
+      <div class="col" style="width:380px;flex:none;gap:12px">
+        <div class="card tight small"><b>New: <code>mailto:</code></b> opens the visitor's email app.</div>
+        <div class="card tight small"><b>New: <code>&lt;textarea&gt;</code></b> = a big text box. It needs a closing tag. <code>rows</code> = its height in lines.</div>
+        <div class="tip small">This form doesn't send messages anywhere yet. A real website needs a server for that.</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 9 · Labels">
+  <p class="kicker">Code-along · STEP 9 · Contact form</p>
+  <h2>Each label on its own line</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="contact" data-pfstep="9" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#contact form">
+      <script type="text/x-css">
+label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    display: block;" data-to="    /* display: block; */">Remove display: block</button></div>
+    <div class="tip">A <code>&lt;label&gt;</code> is inline, so it sits next to the box before it. <code>display: block</code> gives it its own line.</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 9 · Form boxes">
+  <p class="kicker">Code-along · STEP 9 · Contact form</p>
+  <h2>Form boxes as wide as the section</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="contact" data-pfstep="9" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#contact form">
+      <script type="text/x-css">
+/* form boxes don't use the page's font */
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    border: 2px solid #cccccc;
+    border-radius: 6px;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-add="* { box-sizing: content-box; }">Switch off border-box</button><button type="button" class="try" data-from="    font-family: Arial, sans-serif;" data-to="    /* font-family: Arial, sans-serif; */">Remove font-family</button></div>
+    <div class="tip"><code>width: 100%</code> + padding + border would stick out by 24px. <code>border-box</code> from STEP 1 keeps them <b>inside</b>.</div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 9 · Send button">
+  <p class="kicker">Code-along · STEP 9 · Contact form</p>
+  <h2>A round "Send" button</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="contact" data-pfstep="9" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#contact form">
+      <script type="text/x-css">
+button {
+    margin-top: 20px;
+    padding: 12px 30px;
+    background-color: #c2410c;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;    /* the hand cursor */
+}
+button:hover {
+    background-color: #1e3a8a;
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="    border: none;" data-to="    /* border: none; */">Remove border: none</button></div>
+    <div class="tip"><code>border: none</code> removes the grey default border. Fill in the form and press Send: watch the address bar!</div>
+  </div>
+</section>
+<section class="slide" data-part="build" data-title="Footer · HTML">
+  <p class="kicker">Type the HTML · Footer</p>
+  <h2>The footer: the last box</h2>
+  <div class="body">
+    <div class="row fill">
+      <script type="text/x-code" style="flex:1" data-lang="html" data-fs="16" data-file="index.html">
+<div id="footer">
+    <p>&copy; 2026 Ranjit Shrestha &middot; Made with HTML &amp; CSS</p>
+    <p>
+        <a href="https://github.com/">GitHub</a> &middot;
+        <a href="https://www.linkedin.com/">LinkedIn</a> &middot;
+        <a href="#header">Back to top &uarr;</a>
+    </p>
+</div>
+      </script>
+      <div class="col" style="width:380px;flex:none;gap:12px">
+        <div class="card tight small"><code>&amp;copy;</code> &copy; &nbsp; <code>&amp;middot;</code> &middot; &nbsp; <code>&amp;uarr;</code> &uarr;</div>
+        <div class="card tight small"><code>href="#header"</code>: any id can be a jump target.</div>
+        <div class="tip small">Use your real profile links, starting with <code>https://</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide ca" data-part="build" data-title="STEP 10 · Footer">
+  <p class="kicker">Code-along · STEP 10 · Footer</p>
+  <h2>The footer: done!</h2>
+  <div class="body">
+    <div class="live" data-show="css" data-chain="pf" data-pf="footer" data-pfstep="10" data-split="1fr 1.3fr" data-fs="16" data-zoom="0.75" data-url="index.html" data-scroll-to="#footer">
+      <script type="text/x-css">
+#footer {
+    padding: 25px 16px;
+    background-color: #1e3a8a;
+    color: #ffffff;
+    text-align: center;
+}
+#footer a {
+    color: #fdba74;    /* light orange */
+}
+      </script>
+    </div>
+    <div class="tries"><span class="lab">Break it</span><button type="button" class="try" data-from="#footer a {" data-to="#footer &gt; a {">Change to #footer > a</button></div>
+    <div class="tip">The <code>&lt;p&gt;</code> inherits the white colour. The links sit <b>inside a <code>&lt;p&gt;</code></b>, so only <code>#footer a</code> (space) finds them.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="build" data-title="Your portfolio, step by step">
+  <p class="kicker">Done! 🎉</p>
+  <h2>Your portfolio, from plain HTML to finished</h2>
+  <div class="body">
+    <div class="bu" data-zoom="0.62" data-start="10">
+      <div class="bu-side">
+        <div class="card tight bu-card">
+          <div class="bu-step">STEP 10</div>
+          <div class="bu-name">Footer</div>
+          <input type="range" class="bu-range" min="0" max="10" value="10" aria-label="How many CSS steps to show">
+          <p class="xs muted">Drag back to see each step again</p>
+        </div>
+        <label class="bu-box"><input type="checkbox"> Show the boxes</label>
+        <div class="tip small">One HTML file, one CSS file, about 340 lines of CSS, and it is all <b>boxes</b>.</div>
+      </div>
+      <div class="bu-view"></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="build" data-title="Spot the bugs">
+  <p class="kicker">Pair activity</p>
+  <h2>🐞 Spot the 4 bugs</h2>
+  <div class="body">
+    <div class="row fill">
+      <div class="col grow">
+        <script type="text/x-code" data-lang="html" data-fs="17" data-ln data-bugs data-step-lines="1|6" data-file="index.html">
+<div id="#about" class="section">
+    <h2>About Me</h2>
+</div>
+
+<form>
+    <textarea id="message" rows="5" />
+    <button>Send</button>
+</form>
+        </script>
+        <script type="text/x-code" data-lang="css" data-fs="17" data-ln data-bugs data-step-lines="1|5" data-step-base="2" data-file="style.css">
+.button .button-outline {
+    padding: 12px 26px;
+}
+.facts li {
+    padding-left: 0;
+}
+        </script>
+      </div>
+      <div class="col" style="width:460px;flex:none;gap:10px">
+        <div class="card tight frag small" data-step="1"><b>index.html, line 1:</b> no <code>#</code> inside <code>id=""</code> → <code>id="about"</code></div>
+        <div class="card tight frag small" data-step="2"><b>index.html, line 6:</b> <code>&lt;textarea&gt;</code> needs a closing tag → <code>&lt;textarea ...&gt;&lt;/textarea&gt;</code></div>
+        <div class="card tight frag small" data-step="3"><b>style.css, line 1:</b> a space means "inside". Use a comma → <code>.button, .button-outline</code></div>
+        <div class="card tight frag small" data-step="4"><b>style.css, line 5:</b> the 40px gap belongs to the <code>ul</code> → <code>.facts { padding-left: 0; }</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="build" data-title="Quick check 5 · comma vs space" data-section="Quick check">
+  <p class="kicker">Quick check · 5 / 7</p>
+  <h2>What does <code>.button .button-outline { }</code> select?</h2>
+  <div class="body">
+    <div class="opts">
+      <div class="opt"><span class="letter">A</span>Both buttons</div>
+      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>A <code>.button-outline</code> <b>inside</b> a <code>.button</code></div>
+      <div class="opt"><span class="letter">C</span>Only <code>.button</code></div>
+      <div class="opt"><span class="letter">D</span>Every link on the page</div>
+    </div>
+    <div class="explain frag" data-step="1"><span class="ok-badge">B</span><span>A <b>space</b> means "inside". A <b>comma</b> means "and". On our page this selects nothing!</span></div>
+  </div>
+</section>
+
+<section class="slide" data-part="build" data-title="Quick check 6 · which rule wins">
+  <p class="kicker">Quick check · 6 / 7</p>
+  <h2><code>h3 { color: orange; }</code> and <code>.card h3 { color: blue; }</code><br>What colour is a card's title?</h2>
+  <div class="body">
+    <div class="opts">
+      <div class="opt"><span class="letter">A</span>Orange: <code>h3</code> is written first</div>
+      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>Blue: <code>.card h3</code> is more specific</div>
+      <div class="opt"><span class="letter">C</span>Black: the colours cancel out</div>
+      <div class="opt"><span class="letter">D</span>Orange: <code>h3</code> is shorter</div>
+    </div>
+    <div class="explain frag" data-step="1"><span class="ok-badge">B</span><span>A class + an element beats an element alone. The About <code>h3</code> stays orange.</span></div>
+  </div>
+</section>
+
+<section class="slide" data-part="build" data-title="Quick check 7 · box-sizing">
+  <p class="kicker">Quick check · 7 / 7</p>
+  <h2>Without <code>box-sizing: border-box</code>, an input has <code>width: 100%</code>, <code>padding: 10px</code> and a <code>2px</code> border. How wide is it?</h2>
+  <div class="body">
+    <div class="opts">
+      <div class="opt"><span class="letter">A</span>Exactly 100%</div>
+      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>100% + 24px: it sticks out</div>
+      <div class="opt"><span class="letter">C</span>100% − 24px</div>
+      <div class="opt"><span class="letter">D</span>100% + 12px</div>
+    </div>
+    <div class="explain frag" data-step="1"><span class="ok-badge">B</span><span>10 + 10 padding + 2 + 2 border = 24px <b>extra</b>. <code>border-box</code> keeps them <b>inside</b> the 100%.</span></div>
+  </div>
+</section>
+
+<section class="slide" data-part="build" data-title="Homework" data-section="Wrap-up">
+  <p class="kicker">Practice at home</p>
+  <h2>Homework</h2>
+  <div class="body">
+    <ol class="steps">
+      <li><div><b>Make it yours:</b> your own name, photo, text and four colours. <span class="muted small">Tip: use Find &amp; Replace to swap each colour code.</span></div></li>
+      <li><div><b>Real projects:</b> link every project card to a page you made.</div></li>
+      <li><div><b>A sixth section</b> (Hobbies or Certificates): give it an <code>id</code> and <code>class="section"</code>, add a menu link, and reuse the classes you have. No new CSS!</div></li>
+      <li><div><b>Bonus:</b> make the browser window as narrow as a phone. Write down one thing that looks wrong and bring it to class.</div></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-part="build" data-title="What we learned today">
+  <p class="kicker">Summary</p>
+  <h2>Today you learned…</h2>
+  <div class="body">
+    <div class="g2">
+      <ul class="ticks">
+        <li>Box model: <b>content</b>, <b>padding</b>, <b>border</b>, <b>margin</b></li>
+        <li><code>box-sizing</code>: <code>content-box</code> vs <code>border-box</code></li>
+        <li>Shorthand: <code>padding: 6px 14px;</code></li>
+        <li><code>margin: 0</code>, and centring a box with <code>max-width</code> + <code>auto</code></li>
+        <li><code>display</code>: block, inline, inline-block</li>
+        <li><code>#header a</code> (inside) vs <code>#header &gt; a</code> (directly inside)</li>
+      </ul>
+      <ul class="ticks">
+        <li><code>:hover</code> on any element, <code>border-color</code>, <code>border-style</code></li>
+        <li><code>list-style: none</code>, <code>width: 100%</code></li>
+        <li>New HTML: <code>&lt;th&gt;</code>, <code>&lt;textarea&gt;</code>, <code>&amp;amp;</code>, <code>mailto:</code>, <code>href="#id"</code></li>
+        <li>DevTools: Inspect → <b>Computed</b></li>
+        <li>Your portfolio is built! 🎉</li>
+      </ul>
+    </div>
+    <div class="card" style="margin-top:6px">
+      <h3>Keep your portfolio folder safe</h3>
+      <p class="small">We will keep improving this same website in the next lessons.</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide s-end" data-title="Questions & thank you" data-nofoot>
+  <h1>Questions?</h1>
+  <p class="sub">धन्यवाद · Thank you!</p>
+</section>
+
+</div><!-- /#stage -->
+
+<!-- UI outside the stage -->
+<div class="overlay" id="menu"><div class="panel"><h3>All slides <span style="color:#888;font-weight:400;font-size:14px">· click to jump · Esc to close</span></h3><div id="menuList"></div></div></div>
+<div class="overlay" id="help"><div class="panel" style="max-width:640px"><h3>Keyboard shortcuts</h3>
+  <div class="keys">
+    <span><kbd>→</kbd> <kbd>Space</kbd> <kbd>PgDn</kbd></span><span>Next step / next slide (works with presentation clickers)</span>
+    <span><kbd>←</kbd> <kbd>PgUp</kbd></span><span>Previous</span>
+    <span><kbd>Home</kbd> <kbd>End</kbd></span><span>First / last slide</span>
+    <span><kbd>12</kbd> <kbd>Enter</kbd></span><span>Jump to slide 12</span>
+    <span><kbd>M</kbd></span><span>Slide menu</span>
+    <span><kbd>P</kbd></span><span>Presenter window (timer, next slide)</span>
+    <span><kbd>F</kbd></span><span>Fullscreen</span>
+    <span><kbd>D</kbd></span><span>Dark / light theme</span>
+    <span><kbd>B</kbd></span><span>Black screen</span>
+    <span><kbd>Esc</kbd></span><span>Leave a code editor / close menus</span>
+  </div>
+  <p style="color:#aaa;margin:14px 0 0">Code editors on slides are live: click into the code, type, and the preview updates. Press <kbd>Esc</kbd> to get the arrow keys back. Red <b>Break it</b> buttons change the code on purpose: click again to undo. Print to PDF (Ctrl/⌘ + P) gives one slide per page.</p>
+</div></div>
+<div id="black"></div>
+<div id="toast"></div>
+<div id="navBtns"><button type="button" data-act="prev" aria-label="Previous">‹</button><button type="button" data-act="menu" aria-label="Slide menu">☰</button><button type="button" data-act="next" aria-label="Next">›</button></div>
+
+<!-- The portfolio page (copied from css-training/portfolio/index.html), built up section by section -->
+<script type="text/x-html" id="pf-header">
+    <!-- ========== HEADER: my name + menu ========== -->
+    <!-- A <div> is an empty box. We use it to group things so CSS can style them together. -->
+    <div id="header">
+        <p class="logo">Ranjit Shrestha</p>
+
+        <!-- href="#about" jumps to the element with id="about" on this same page -->
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#projects">Projects</a>
+        <a href="#education">Education</a>
+        <a href="#contact">Contact</a>
+    </div>
+</script>
+<script type="text/x-html" id="pf-hero">
+    <!-- ========== HERO: the first thing visitors see ========== -->
+    <div id="hero">
+        <!-- Swap this for your own SQUARE photo, e.g. images/me.jpg -->
+        <img src="images/profile.svg" alt="Profile photo" class="profile-photo">
+
+        <p class="greeting">Namaste, I am</p>
+        <h1>Ranjit Shrestha</h1>
+        <p class="tagline">BCA Student &amp; Aspiring Web Developer</p>
+
+        <p class="intro">
+            I am a first-semester BCA student from Kathmandu. I enjoy turning
+            ideas into simple, friendly web pages with HTML and CSS.
+        </p>
+
+        <a href="#projects" class="button">See My Projects</a>
+        <a href="#contact" class="button-outline">Contact Me</a>
+    </div>
+</script>
+<script type="text/x-html" id="pf-page-open">
+    <!-- Everything below sits inside this box, so we can keep it in the middle of the screen -->
+    <div class="page">
+</script>
+<script type="text/x-html" id="pf-about">
+        <!-- ========== ABOUT ========== -->
+        <div id="about" class="section">
+            <h2>About Me</h2>
+
+            <p>
+                Hi! I am <strong>Ranjit</strong>, a BCA student at Example College,
+                Kathmandu. I enjoy learning about computers, and building web pages
+                is my favourite part so far.
+            </p>
+            <p>
+                When I am not coding, you will find me playing football, reading
+                books or travelling with friends. My favourite book is
+                <em>The Alchemist</em>.
+            </p>
+
+            <p class="highlight">
+                <strong>My goal:</strong> to become a skilled web developer and build
+                websites that help people in Nepal.
+            </p>
+
+            <h3>Quick Facts</h3>
+            <ul class="facts">
+                <li><strong>Location:</strong> Kathmandu, Nepal</li>
+                <li><strong>Studying:</strong> BCA, First Semester</li>
+                <li><strong>Languages:</strong> Nepali, English, Hindi</li>
+                <li><strong>Hobbies:</strong> Football, reading, travelling</li>
+            </ul>
+        </div>
+</script>
+<script type="text/x-html" id="pf-skills">
+        <!-- ========== SKILLS ========== -->
+        <div id="skills" class="section">
+            <h2>My Skills</h2>
+
+            <h3>I can use</h3>
+            <ul class="skill-list">
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>C Programming</li>
+                <li>MS Word</li>
+                <li>MS Excel</li>
+                <li>Canva</li>
+            </ul>
+
+            <h3>I am learning</h3>
+            <ul class="learning-list">
+                <li>JavaScript</li>
+                <li>Git &amp; GitHub</li>
+                <li>Responsive Design</li>
+            </ul>
+        </div>
+</script>
+<script type="text/x-html" id="pf-projects">
+        <!-- ========== PROJECTS ========== -->
+        <div id="projects" class="section">
+            <h2>My Projects</h2>
+            <p>A few things I have built while learning web development.</p>
+
+            <!-- Each project is a "card". The same class is used 4 times.
+                 The ../../ links open our class files in this repo.
+                 In your own portfolio, point each link at your own page. -->
+            <div class="card">
+                <h3>Student Profile Page</h3>
+                <p>
+                    My very first web page, with headings, paragraphs, a photo,
+                    lists and links.
+                </p>
+                <p class="built-with">Built with: HTML, CSS</p>
+                <a href="../../assignments/assignment.html">View project &rarr;</a>
+            </div>
+
+            <div class="card">
+                <h3>Registration Form</h3>
+                <p>
+                    A sign-up form with text, email, date, radio buttons, checkboxes
+                    and a dropdown of Nepal's seven provinces.
+                </p>
+                <p class="built-with">Built with: HTML forms</p>
+                <a href="../../html-training/advance-form.html">View project &rarr;</a>
+            </div>
+
+            <div class="card">
+                <h3>Student Table</h3>
+                <p>A table of students, their cities and their colleges.</p>
+                <p class="built-with">Built with: HTML tables</p>
+                <a href="../../html-training/table-example.html">View project &rarr;</a>
+            </div>
+
+            <div class="card">
+                <h3>This Portfolio</h3>
+                <p>The page you are reading now! One HTML file and one CSS file.</p>
+                <p class="built-with">Built with: HTML, CSS</p>
+                <a href="css/style.css">View the CSS &rarr;</a>
+            </div>
+        </div>
+</script>
+<script type="text/x-html" id="pf-education">
+        <!-- ========== EDUCATION ========== -->
+        <div id="education" class="section">
+            <h2>Education</h2>
+
+            <!-- <th> is a heading cell: bold and centred by default -->
+            <table>
+                <tr>
+                    <th>Level</th>
+                    <th>School / College</th>
+                    <th>Years</th>
+                </tr>
+                <tr>
+                    <td>BCA</td>
+                    <td>Example College, Kathmandu</td>
+                    <td>2026 &ndash; now</td>
+                </tr>
+                <tr>
+                    <td>+2 (Grade 11&ndash;12)</td>
+                    <td>Example Secondary School</td>
+                    <td>2024 &ndash; 2026</td>
+                </tr>
+                <tr>
+                    <td>SEE (Grade 10)</td>
+                    <td>Example Secondary School</td>
+                    <td>2024</td>
+                </tr>
+            </table>
+        </div>
+</script>
+<script type="text/x-html" id="pf-contact">
+        <!-- ========== CONTACT ========== -->
+        <div id="contact" class="section">
+            <h2>Contact Me</h2>
+            <p>Have a question or an idea? Send me a message!</p>
+
+            <ul class="facts">
+                <li><strong>Email:</strong> <a href="mailto:ranjit@example.com">ranjit@example.com</a></li>
+                <li><strong>Phone:</strong> +977 98XXXXXXXX</li>
+                <li><strong>Location:</strong> Kathmandu, Nepal</li>
+            </ul>
+
+            <!-- This form does not send messages anywhere yet.
+                 A real website needs a server (a "backend") to receive them. -->
+            <form action="" method="GET">
+                <label for="name">Your Name</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Your Email</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="subject">Subject</label>
+                <select id="subject" name="subject">
+                    <option value="project">A project idea</option>
+                    <option value="hello">Just saying hi</option>
+                    <option value="other">Something else</option>
+                </select>
+
+                <!-- <textarea> is a big text box for long messages -->
+                <label for="message">Message</label>
+                <textarea id="message" name="message" rows="5" required></textarea>
+
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+</script>
+<script type="text/x-html" id="pf-footer">
+    <!-- ========== FOOTER ========== -->
+    <div id="footer">
+        <p>&copy; 2026 Ranjit Shrestha &middot; Made with HTML &amp; CSS</p>
+        <p>
+            <a href="https://github.com/">GitHub</a> &middot;
+            <a href="https://www.linkedin.com/">LinkedIn</a> &middot;
+            <a href="#header">Back to top &uarr;</a>
+        </p>
+    </div>
+</script>
+
+<script>
+(function(){
+'use strict';
+var W = 1280, H = 720;
+function $(s, r){ return (r || document).querySelector(s); }
+function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+function mk(tag, cls){ var e = document.createElement(tag); if (cls) e.className = cls; return e; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+var stage = $('#stage');
+var slides = $$('.slide', stage);
+var N = slides.length;
+var cur = -1;
+
+/* ---------------------------------------------------------
+   Text helpers
+   --------------------------------------------------------- */
+function dedent(s){
+  s = s.replace(/\t/g, '    ').replace(/^\s*\n/, '').replace(/\s+$/, '');
+  var lines = s.split('\n');
+  var ind = Infinity;
+  lines.forEach(function(l){ if (l.trim()) ind = Math.min(ind, l.match(/^ */)[0].length); });
+  if (ind === Infinity) ind = 0;
+  return lines.map(function(l){ return l.slice(ind); }).join('\n');
+}
+
+/* ---------------------------------------------------------
+   Tiny HTML + CSS syntax highlighter
+   --------------------------------------------------------- */
+function tokHTML(src){
+  var out = [], i = 0, n = src.length;
+  function push(t, v){ if (v) out.push({t: t, v: v}); }
+  while (i < n){
+    if (src.startsWith('<!--', i)){
+      var e = src.indexOf('-->', i + 4); e = e < 0 ? n : e + 3;
+      push('com', src.slice(i, e)); i = e; continue;
+    }
+    var m = src[i] === '<' ? /^<(\/?)([a-zA-Z][\w-]*)/.exec(src.slice(i, i + 64)) : null;
+    if (m){
+      push('pun', '<' + m[1]); push('tag', m[2]); i += m[0].length;
+      while (i < n){
+        var rest = src.slice(i), mm;
+        if ((mm = /^\s+/.exec(rest))){ push('txt', mm[0]); i += mm[0].length; continue; }
+        if ((mm = /^\/?>/.exec(rest))){ push('pun', mm[0]); i += mm[0].length; break; }
+        if (rest[0] === '='){ push('pun', '='); i++; continue; }
+        if ((mm = /^"[^"]*"?|^'[^']*'?/.exec(rest))){ push('str', mm[0]); i += mm[0].length; continue; }
+        if ((mm = /^[^\s=>"'\/]+/.exec(rest))){ push('attr', mm[0]); i += mm[0].length; continue; }
+        push('txt', rest[0]); i++;
+      }
+      if (!m[1] && m[2].toLowerCase() === 'style'){
+        var j = src.toLowerCase().indexOf('</style', i); if (j < 0) j = n;
+        out.push.apply(out, tokCSS(src.slice(i, j))); i = j;
+      }
+      continue;
+    }
+    var k = src.indexOf('<', i + 1); if (k < 0) k = n;
+    push('txt', src.slice(i, k)); i = k;
+  }
+  return out;
+}
+function tokCSS(src){
+  var out = [], i = 0, n = src.length, depth = 0, inVal = false;
+  function push(t, v){ if (v) out.push({t: t, v: v}); }
+  while (i < n){
+    var rest = src.slice(i), m, c = rest[0];
+    if (rest.startsWith('/*')){
+      var e = src.indexOf('*/', i + 2); e = e < 0 ? n : e + 2;
+      push('com', src.slice(i, e)); i = e; continue;
+    }
+    if (c === '{'){ push('pun', '{'); depth++; inVal = false; i++; continue; }
+    if (c === '}'){ push('pun', '}'); depth = Math.max(0, depth - 1); inVal = false; i++; continue; }
+    if (depth === 0){
+      if ((m = /^@[\w-]+/.exec(rest))){ push('at', m[0]); i += m[0].length; continue; }
+      if ((m = /^[^{}\/]+/.exec(rest))){ push('sel', m[0]); i += m[0].length; continue; }
+      push('txt', c); i++; continue;
+    }
+    if (!inVal){
+      if ((m = /^\s+/.exec(rest))){ push('txt', m[0]); i += m[0].length; continue; }
+      if ((m = /^[\w-]+(?=\s*:)/.exec(rest))){ push('prop', m[0]); i += m[0].length; continue; }
+      if (c === ':'){ push('pun', ':'); inVal = true; i++; continue; }
+      if (c === ';'){ push('pun', ';'); i++; continue; }
+      if ((m = /^[^{}:;\/\s]+/.exec(rest))){ push('txt', m[0]); i += m[0].length; continue; }
+      push('txt', c); i++; continue;
+    }
+    if (c === ';'){ push('pun', ';'); inVal = false; i++; continue; }
+    if ((m = /^\s+/.exec(rest))){ push('txt', m[0]); i += m[0].length; continue; }
+    if ((m = /^#[0-9a-fA-F]{3,8}\b/.exec(rest))){ push('num', m[0]); i += m[0].length; continue; }
+    if ((m = /^-?(\d+\.?\d*|\.\d+)(px|em|rem|%|vh|vw|ms|s|deg|fr)?/.exec(rest))){ push('num', m[0]); i += m[0].length; continue; }
+    if ((m = /^"[^"]*"?|^'[^']*'?/.exec(rest))){ push('str', m[0]); i += m[0].length; continue; }
+    if ((m = /^[\w-]+(?=\()/.exec(rest))){ push('fn', m[0]); i += m[0].length; continue; }
+    if ((m = /^!?[\w-]+/.exec(rest))){ push('val', m[0]); i += m[0].length; continue; }
+    push('pun', c); i++;
+  }
+  return out;
+}
+function tokens(src, lang){ return lang === 'css' ? tokCSS(src) : tokHTML(src); }
+function hlString(src, lang){
+  return tokens(src, lang).map(function(tk){ return tk.t === 'txt' ? esc(tk.v) : '<span class="t-' + tk.t + '">' + esc(tk.v) + '</span>'; }).join('');
+}
+function toLines(toks){
+  var lines = [[]];
+  toks.forEach(function(tk){
+    tk.v.split('\n').forEach(function(p, k){
+      if (k) lines.push([]);
+      if (p) lines[lines.length - 1].push(tk.t === 'txt' ? esc(p) : '<span class="t-' + tk.t + '">' + esc(p) + '</span>');
+    });
+  });
+  return lines.map(function(l){ return l.join(''); });
+}
+function fileIcon(lang){ return '<span class="fi fi-' + lang + '">' + (lang === 'css' ? '#' : '&lt;/&gt;') + '</span>'; }
+function ranges(str){
+  var s = new Set();
+  (str || '').split(',').forEach(function(p){
+    p = p.trim(); if (!p) return;
+    var ab = p.split('-').map(Number), a = ab[0], b = ab[1] || ab[0];
+    for (var k = a; k <= b; k++) s.add(k);
+  });
+  return s;
+}
+
+/* ---------------------------------------------------------
+   Static code blocks:  <script type="text/x-code" data-lang="css">
+   --------------------------------------------------------- */
+$$('script[type="text/x-code"]').forEach(function(sc){
+  var lang = sc.dataset.lang || 'html';
+  var src = dedent(sc.textContent);
+  var box = mk('div', 'cb' + (sc.hasAttribute('data-ln') ? ' ln' : ''));
+  if (sc.getAttribute('style')) box.setAttribute('style', sc.getAttribute('style'));
+  if (sc.dataset.fs) box.style.setProperty('--fs', sc.dataset.fs + 'px');
+  if (sc.dataset.file){
+    var tab = mk('div', 'cb-tab');
+    tab.innerHTML = fileIcon(lang) + '<span>' + esc(sc.dataset.file) + '</span>';
+    box.appendChild(tab);
+  }
+  var hl = ranges(sc.dataset.hl), stepOf = new Map();
+  if (sc.dataset.stepLines) sc.dataset.stepLines.split('|').forEach(function(r, k){ ranges(r).forEach(function(ln){ stepOf.set(ln, k + 1); }); });
+  var bugs = sc.hasAttribute('data-bugs'), stepBase = +(sc.dataset.stepBase || 0);
+  var pre = mk('pre'), code = mk('code');
+  code.innerHTML = toLines(tokens(src, lang)).map(function(l, k){
+    var n = k + 1, cls = 'line', attr = '';
+    if (hl.has(n)) cls += ' hl';
+    if (stepOf.has(n)){ cls += ' frag keep ' + (bugs ? 'bug' : 'hl-step'); attr = ' data-step="' + (stepOf.get(n) + stepBase) + '"'; }
+    return '<span class="' + cls + '"' + attr + '>' + (l || '​') + '</span>';
+  }).join('');
+  pre.appendChild(code); box.appendChild(pre);
+  sc.parentNode.replaceChild(box, sc);
+});
+
+/* ---------------------------------------------------------
+   Live demos: editable code + real preview in an iframe
+   --------------------------------------------------------- */
+var AVATAR = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#a5d8ff"/><circle cx="100" cy="82" r="38" fill="#1c3d5a"/><path d="M28 200c4-52 36-80 72-80s68 28 72 80z" fill="#1c3d5a"/></svg>');
+var PROFILE = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400"> <rect width="400" height="400" fill="#fde2c8"/> <circle cx="200" cy="160" r="75" fill="#c2410c"/> <path d="M60 400 C60 295 125 255 200 255 C275 255 340 295 340 400 Z" fill="#c2410c"/> </svg>');
+var FILES = {'photo.jpg': AVATAR, 'images/profile.svg': PROFILE, 'images/me.jpg': PROFILE};
+
+function insertText(ta, text){
+  var ok = false;
+  try { ok = document.execCommand('insertText', false, text); } catch (e) {}
+  if (!ok){ ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, 'end'); ta.dispatchEvent(new Event('input')); }
+}
+function makeEditor(lang, value, onChange, fs){
+  var el = mk('div', 'editor'); if (fs) el.style.setProperty('--fs', fs + 'px');
+  var pre = mk('pre'), code = mk('code'); pre.setAttribute('aria-hidden', 'true'); pre.appendChild(code);
+  var ta = mk('textarea'); ta.value = value; ta.spellcheck = false;
+  ['wrap:off', 'autocomplete:off', 'autocorrect:off', 'autocapitalize:off'].forEach(function(p){ var kv = p.split(':'); ta.setAttribute(kv[0], kv[1]); });
+  ta.setAttribute('aria-label', lang.toUpperCase() + ' code editor');
+  function sync(){ pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft; }
+  function paint(){ code.innerHTML = hlString(ta.value, lang) + '\n '; sync(); }
+  ta.addEventListener('input', function(){ paint(); onChange(ta.value); });
+  ta.addEventListener('scroll', sync);
+  ta.addEventListener('keydown', function(e){
+    if (e.key === 'Escape'){ ta.blur(); e.stopPropagation(); return; }
+    if (e.key === 'Tab'){ e.preventDefault(); insertText(ta, '    '); return; }
+    var v = ta.value, s = ta.selectionStart, ls = v.lastIndexOf('\n', s - 1) + 1;
+    if (e.key === 'Enter' && !e.shiftKey && !e.metaKey && !e.ctrlKey){
+      e.preventDefault();
+      var line = v.slice(ls, s), ind = (line.match(/^ */) || [''])[0];
+      if (/\{\s*$/.test(line)) ind += '    ';
+      insertText(ta, '\n' + ind); return;
+    }
+    if (e.key === '}' && s === ta.selectionEnd && /^ {4,}$/.test(v.slice(ls, s))){
+      e.preventDefault(); ta.setSelectionRange(s - 4, s); insertText(ta, '}');
+    }
+  });
+  el.appendChild(pre); el.appendChild(ta); paint();
+  return { el: el, setValue: function(v){ ta.value = v; paint(); onChange(v); }, getValue: function(){ return ta.value; } };
+}
+function chainCss(box){
+  var name = box.dataset.chain; if (!name) return '';
+  var s = '', list = $$('.live[data-chain="' + name + '"]');
+  for (var i = 0; i < list.length; i++){ if (list[i] === box) break; if (list[i]._st) s += list[i]._st.css + '\n'; }
+  return s;
+}
+function fixImgs(h){ return h.replace(/(<img\b[^>]*?\s)src="([^"]*)"/gi, function(m, pre, v){ return FILES[v] ? pre + 'src="' + FILES[v] + '"' : m; }); }
+function buildDoc(box){
+  var st = box._st;
+  var css = st.cssOn ? chainCss(box) + st.css : '';
+  var html = fixImgs(st.html);
+  var head = '<meta charset="utf-8">' + (css ? '<style>\n' + css + '\n</style>' : '');
+  if (/<html[\s>]/i.test(html)){
+    html = /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, function(m){ return m + head; })
+                                      : html.replace(/<html[^>]*>/i, function(m){ return m + '<head>' + head + '</head>'; });
+    return '<!DOCTYPE html>' + html;
+  }
+  return '<!DOCTYPE html><html><head>' + head + '</head><body>' + html + '</body></html>';
+}
+function renderUrl(o, action, method, q){
+  if (method !== 'GET'){
+    o.innerHTML = '<span class="u-act">' + esc(action) + '</span> <span class="u-note">sent with POST, so the data is NOT in the address</span>';
+  } else {
+    var pairs = q ? q.split('&') : [];
+    o.innerHTML = '<span class="u-act">' + esc(action) + '</span><span class="u-q">?</span>' + pairs.map(function(pr){
+      var i = pr.indexOf('='), k = i < 0 ? pr : pr.slice(0, i), v = i < 0 ? '' : pr.slice(i + 1);
+      return '<span class="u-k">' + esc(k) + '</span><span class="u-eq">=</span><span class="u-v' + (/pass/i.test(k) ? ' secret' : '') + '">' + esc(v) + '</span>';
+    }).join('<span class="u-amp">&amp;</span>');
+  }
+  o.classList.remove('flash'); void o.offsetWidth; o.classList.add('flash');
+}
+function splitCols(s){ return s.trim().split(/\s+/).map(function(x){ return 'minmax(0,' + x + ')'; }).join(' '); }
+
+function initLive(box){
+  function grab(t){ var s = box.querySelector('script[type="' + t + '"]'); return s ? dedent(s.textContent) : null; }
+  var html = grab('text/x-html');
+  if (html == null && box.dataset.htmlRef){ var r = document.getElementById(box.dataset.htmlRef); html = r ? dedent(r.textContent) : ''; }
+  if (html == null && box.dataset.pf) html = buildPf(box.dataset.pf);
+  var css = grab('text/x-css');
+  var show = box.dataset.show || (css != null ? 'css' : 'html');
+  var hasToggle = box.hasAttribute('data-toggle');
+  var st = { html: html || '', css: css || '', cssOn: !hasToggle };
+  var orig = { html: st.html, css: st.css };
+  box._st = st; box._orig = orig;
+  box.textContent = '';
+
+  var grid = mk('div', 'live-grid');
+  if (box.dataset.layout === 'col'){ grid.style.gridTemplateRows = splitCols(box.dataset.split || '1fr 1fr'); grid.style.gridTemplateColumns = 'minmax(0,1fr)'; }
+  else grid.style.gridTemplateColumns = splitCols(box.dataset.split || (show === 'none' ? '1fr' : '1fr 1fr'));
+
+  if (show !== 'none'){
+    var pane = mk('div', 'live-code'), tab = mk('div', 'cb-tab');
+    tab.innerHTML = fileIcon(show) + '<span>' + esc(box.dataset.file || (show === 'css' ? 'style.css' : 'index.html')) + '</span><span class="ed-hint">✎ click to edit</span>';
+    var rb = mk('button', 'mini'); rb.type = 'button'; rb.textContent = '↺ Reset'; rb.title = 'Put the original code back';
+    tab.appendChild(rb);
+    var editor = makeEditor(show, st[show], function(v){ st[show] = v; schedule(); }, box.dataset.fs);
+    rb.addEventListener('click', function(){ editor.setValue(orig[show]); if (box._resetTries) box._resetTries(); });
+    box._ed = editor;
+    pane.appendChild(tab); pane.appendChild(editor.el); grid.appendChild(pane);
+  }
+
+  var out = mk('div', 'live-out'), bar = mk('div', 'bbar');
+  bar.innerHTML = '<span class="dots"><i></i><i></i><i></i></span><span class="btab"></span><span class="url"></span>';
+  var btab = $('.btab', bar), url = $('.url', bar), tg = null;
+  if (hasToggle){
+    tg = mk('button', 'css-toggle'); tg.type = 'button';
+    tg.addEventListener('click', function(){ setCss(!st.cssOn); });
+    bar.appendChild(tg);
+  }
+  var fw = mk('div', 'fwrap'), ifr = mk('iframe');
+  ifr.title = 'Live preview';
+  var z = parseFloat(box.dataset.zoom || '1.15');
+  ifr.style.width = (100 / z) + '%'; ifr.style.height = (100 / z) + '%'; ifr.style.transform = 'scale(' + z + ')';
+  fw.appendChild(ifr); out.appendChild(bar); out.appendChild(fw); grid.appendChild(out); box.appendChild(grid);
+
+  var pageUrl = box.dataset.url || (show === 'html' && box.dataset.file) || 'index.html';
+  function setUrl(u, flash){ url.textContent = u; if (flash){ url.classList.remove('flash'); void url.offsetWidth; url.classList.add('flash'); } }
+  function setCss(on){ st.cssOn = on; if (tg){ tg.textContent = on ? 'CSS: ON' : 'CSS: OFF'; tg.classList.toggle('on', on); } render(); }
+  function render(){
+    var t = (st.html.match(/<title>([\s\S]*?)<\/title>/i) || [])[1];
+    btab.textContent = (t && t.trim()) || box.dataset.title || pageUrl;
+    setUrl(pageUrl);
+    ifr.srcdoc = buildDoc(box);
+  }
+  var tm = null;
+  function schedule(){ clearTimeout(tm); tm = setTimeout(render, 220); }
+
+  ifr.addEventListener('load', function(){
+    var d, w;
+    try { d = ifr.contentDocument; w = ifr.contentWindow; } catch (e) { return; }
+    if (!d) return;
+    d.addEventListener('keydown', onKey);
+    d.addEventListener('click', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if (a){
+        e.preventDefault();
+        var href = a.getAttribute('href');
+        if (href.charAt(0) === '#'){ jumpTo(d, href); setUrl(pageUrl + href, true); return; }
+        setUrl(href, true); toast('Link → ' + href);
+      }
+    });
+    d.addEventListener('submit', function(e){
+      e.preventDefault();
+      var f = e.target, p = new URLSearchParams();
+      new w.FormData(f).forEach(function(v, k){ p.append(k, typeof v === 'string' ? v : (v.name || '')); });
+      var action = f.getAttribute('action') || pageUrl;
+      var method = (f.getAttribute('method') || 'GET').toUpperCase();
+      var q = p.toString();
+      setUrl(method === 'GET' ? action + '?' + q : action + '   (POST)', true);
+      if (box.dataset.urlOut){ var o = $(box.dataset.urlOut); if (o) renderUrl(o, action, method, q); }
+    });
+    if (box.dataset.scrollTo){
+      var t = d.querySelector(box.dataset.scrollTo);
+      if (t){
+        var y = Math.max(0, t.getBoundingClientRect().top + w.scrollY - 30);
+        try { w.scrollTo({top: y, left: 0, behavior: 'instant'}); } catch (e2) { w.scrollTo(0, y); }
+      }
+    }
+  });
+
+  box._render = render;
+  box._onFrag = function(on){ if (hasToggle) setCss(on); };
+  if (tg){ tg.textContent = 'CSS: OFF'; }
+  render();
+}
+$$('.live').forEach(initLive);
+
+/* ---------------------------------------------------------
+   Slide meta, fragments, footers
+   --------------------------------------------------------- */
+(function(){
+  var sec = '';
+  slides.forEach(function(s, i){
+    if (s.dataset.section) sec = s.dataset.section;
+    s._sec = sec;
+    var hd = $('h2', s) || $('h1', s);
+    s._title = (s.dataset.title || (hd ? hd.textContent : 'Slide ' + (i + 1))).trim();
+    var fr = $$('.frag', s), steps = [];
+    if (fr.some(function(f){ return f.dataset.step; })){
+      var m = new Map();
+      fr.forEach(function(f){ var k = +(f.dataset.step || 0); if (!m.has(k)) m.set(k, []); m.get(k).push(f); });
+      steps = Array.from(m.keys()).sort(function(a, b){ return a - b; }).map(function(k){ return m.get(k); });
+    } else steps = fr.map(function(f){ return [f]; });
+    s._steps = steps; s._shown = 0;
+    if (!s.hasAttribute('data-nofoot')){
+      var f = mk('div', 'foot');
+      f.innerHTML = '<span>' + esc(sec) + '</span><span>' + (i + 1) + ' / ' + N + '</span><div class="bar"><i style="width:' + ((i + 1) / N * 100).toFixed(2) + '%"></i></div>';
+      s.appendChild(f);
+    }
+  });
+})();
+
+function setStep(s, n){
+  s._shown = n;
+  s._steps.forEach(function(g, idx){
+    g.forEach(function(f){
+      var on = idx < n;
+      if (f.classList.contains('shown') !== on){ f.classList.toggle('shown', on); if (f._onFrag) f._onFrag(on); }
+    });
+  });
+  /* at1, at2 … on the slide drive the picture-story animations */
+  for (var k = 1; k <= s._steps.length; k++) s.classList.toggle('at' + k, k <= n);
+  try { s.dispatchEvent(new CustomEvent('step', {detail: n})); } catch (e) {}
+}
+
+/* ---------------------------------------------------------
+   Navigation
+   --------------------------------------------------------- */
+function blurAll(){
+  var a = document.activeElement;
+  if (a && a !== document.body){ try { a.blur(); } catch (e) {} }
+  if (a && a.tagName === 'IFRAME' && document.hasFocus()){ try { window.focus(); } catch (e) {} }
+}
+function go(i, mode){
+  i = Math.max(0, Math.min(N - 1, i));
+  var changed = i !== cur;
+  if (changed){
+    if (cur >= 0){ restoreTries(slides[cur]); slides[cur].classList.remove('active'); }
+    blurAll();
+  }
+  cur = i;
+  var s = slides[cur];
+  s.classList.add('active');
+  if (changed || mode) setStep(s, mode === 'end' ? s._steps.length : 0);
+  if (changed) $$('.live[data-chain]', s).forEach(function(l){ l._render(); });
+  try { history.replaceState(null, '', '#' + (cur + 1)); } catch (e) {}
+  updatePresenter();
+}
+function next(){
+  var s = slides[cur];
+  if (s._shown < s._steps.length){ setStep(s, s._shown + 1); updatePresenter(); }
+  else if (cur < N - 1) go(cur + 1, 'start');
+}
+function prev(){
+  var s = slides[cur];
+  if (s._shown > 0){ setStep(s, s._shown - 1); updatePresenter(); }
+  else if (cur > 0) go(cur - 1, 'end');
+}
+
+function fit(){
+  var s = Math.min(innerWidth / W, innerHeight / H);
+  stage.style.transform = 'translate(' + (innerWidth - W * s) / 2 + 'px,' + (innerHeight - H * s) / 2 + 'px) scale(' + s + ')';
+}
+addEventListener('resize', fit);
+
+/* ---------------------------------------------------------
+   Overlays, toast, theme
+   --------------------------------------------------------- */
+var toastEl = $('#toast'), toastT = null;
+function toast(msg){ toastEl.textContent = msg; toastEl.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove('on'); }, 1800); }
+function anyOverlay(){ return $$('.overlay.on').length > 0; }
+function closeOverlays(){ $$('.overlay.on').forEach(function(o){ o.classList.remove('on'); }); }
+function toggleOverlay(id){
+  var o = document.getElementById(id), was = o.classList.contains('on');
+  closeOverlays();
+  if (!was){
+    o.classList.add('on');
+    if (id === 'menu'){
+      $$('#menuList button').forEach(function(b){ b.classList.toggle('cur', +b.dataset.i === cur); });
+      var c = $('#menuList button.cur'); if (c) c.scrollIntoView({block: 'nearest'});
+    }
+  }
+}
+(function buildMenu(){
+  var h = '', last = null;
+  slides.forEach(function(s, i){
+    if (s._sec !== last){ if (last !== null) h += '</div>'; h += '<div class="mgroup"><h4>' + esc(s._sec) + '</h4>'; last = s._sec; }
+    h += '<button type="button" data-i="' + i + '"><span>' + (i + 1) + '</span>' + esc(s._title) + '</button>';
+  });
+  $('#menuList').innerHTML = h + '</div>';
+  $('#menuList').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-i]'); if (b){ closeOverlays(); go(+b.dataset.i); }
+  });
+})();
+$$('.overlay').forEach(function(o){ o.addEventListener('click', function(e){ if (e.target === o) closeOverlays(); }); });
+
+function setTheme(t){ document.documentElement.dataset.theme = t; try { localStorage.setItem('deck-theme', t); } catch (e) {} }
+try { var savedTheme = localStorage.getItem('deck-theme'); if (savedTheme) document.documentElement.dataset.theme = savedTheme; } catch (e) {}
+
+function toggleFullscreen(){
+  try {
+    var pr = document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+    if (pr && pr.catch) pr.catch(function(){ toast('Press F in the slides window to go fullscreen'); });
+  } catch (e) { toast('Fullscreen is not available here'); }
+}
+
+/* ---------------------------------------------------------
+   Presenter window (timer + next slide)
+   --------------------------------------------------------- */
+var pw = null, t0 = null;
+var PRES = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Presenter view</title><style>' +
+  'body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#16151d;color:#eee;display:flex;flex-direction:column;height:100vh}' +
+  'header{display:flex;gap:30px;align-items:flex-end;padding:14px 22px;background:#201f2b;border-bottom:1px solid #333}' +
+  '.big{font:700 32px ui-monospace,Menlo,Consolas,monospace}.lab{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:#999;margin-bottom:2px}' +
+  'main{flex:1;overflow:auto;padding:18px 26px;font-size:21px;line-height:1.55}main h1{font-size:26px;margin:0 0 10px;color:#ffb48c}' +
+  'code{font-family:ui-monospace,Menlo,monospace;background:#2c2b3a;padding:1px 5px;border-radius:4px;font-size:.9em}' +
+  'kbd{font-family:ui-monospace,Menlo,monospace;border:1px solid #555;border-radius:4px;padding:0 4px;font-size:.85em}' +
+  'footer{padding:12px 22px;background:#201f2b;border-top:1px solid #333;font-size:17px;color:#bbb;display:flex;gap:12px;align-items:center}' +
+  'button{font:inherit;font-size:16px;padding:7px 16px;border-radius:8px;border:1px solid #555;background:#2c2b3a;color:#eee;cursor:pointer}' +
+  'button:hover{background:#3a3850}' +
+  '</style></head><body>' +
+  '<header><div><div class="lab">Slide</div><div class="big" id="num"></div></div>' +
+  '<div><div class="lab">Elapsed</div><div class="big" id="elapsed">0:00:00</div></div>' +
+  '<div style="flex:1"><div class="lab">Section</div><div id="section" style="font-size:17px"></div></div>' +
+  '<div style="text-align:right"><div class="lab">Clock</div><div class="big" id="clock"></div></div></header>' +
+  '<main><h1 id="title"></h1></main>' +
+  '<footer><button id="prev">◀ Prev</button><button id="next">Next ▶</button><button id="reset">Restart timer</button>' +
+  '<span id="step"></span><span style="margin-left:auto">Next slide: <b id="nexttitle" style="color:#eee"></b></span></footer>' +
+  '</body></html>';
+function openPresenter(){
+  try { pw = window.open('', 'deck-presenter', 'width=1000,height=720'); } catch (e) { pw = null; }
+  if (!pw){ toast('Pop-up blocked. Allow pop-ups for this file.'); return; }
+  try {
+    var d = pw.document;
+    d.open(); d.write(PRES); d.close();
+    d.addEventListener('keydown', onKey);
+    d.getElementById('prev').onclick = prev;
+    d.getElementById('next').onclick = next;
+    d.getElementById('reset').onclick = function(){ t0 = Date.now(); tick(); };
+    if (t0 === null) t0 = Date.now();
+    updatePresenter();
+  } catch (e) { pw = null; toast('Presenter view is not available here.'); }
+}
+function updatePresenter(){
+  if (!pw || pw.closed) return;
+  try {
+    var d = pw.document, s = slides[cur];
+    d.getElementById('num').textContent = (cur + 1) + ' / ' + N;
+    d.getElementById('title').textContent = s._title;
+    d.getElementById('section').textContent = s._sec;
+    d.getElementById('nexttitle').textContent = cur < N - 1 ? slides[cur + 1]._title : '(end)';
+    d.getElementById('step').textContent = s._steps.length ? 'Reveals: ' + s._shown + ' / ' + s._steps.length : '';
+    tick();
+  } catch (e) {}
+}
+function tick(){
+  if (!pw || pw.closed || t0 === null) return;
+  try {
+    var d = pw.document, sec = Math.floor((Date.now() - t0) / 1000);
+    d.getElementById('elapsed').textContent = Math.floor(sec / 3600) + ':' + String(Math.floor(sec / 60) % 60).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0');
+    d.getElementById('clock').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+  } catch (e) {}
+}
+setInterval(tick, 1000);
+
+/* ---------------------------------------------------------
+   Keyboard
+   --------------------------------------------------------- */
+var TYPING = /^(text|email|password|number|search|tel|url|date|datetime-local|time|month|week)$/i;
+function isTyping(t){
+  if (!t || !t.tagName) return false;
+  var tag = t.tagName.toUpperCase();
+  if (tag === 'TEXTAREA' || tag === 'SELECT' || t.isContentEditable) return true;
+  if (tag === 'INPUT') return TYPING.test(t.type || 'text');
+  return false;
+}
+var numBuf = '', numT = null;
+function onKey(e){
+  var t = e.target, k = e.key;
+  if (isTyping(t)){ if (k === 'Escape') t.blur(); return; }
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  if (t && t.tagName && t.tagName.toUpperCase() === 'BUTTON' && (k === ' ' || k === 'Enter')) return;
+  if (k === 'Escape'){ closeOverlays(); $('#black').classList.remove('on'); return; }
+  if (anyOverlay() && k !== 'm' && k !== 'M' && k !== '?') return;
+  if (k === 'Enter' && numBuf){ go(+numBuf - 1); numBuf = ''; e.preventDefault(); return; }
+  if (k === 'ArrowRight' || k === 'ArrowDown' || k === ' ' || k === 'PageDown' || k === 'Enter'){ next(); e.preventDefault(); return; }
+  if (k === 'ArrowLeft' || k === 'ArrowUp' || k === 'PageUp' || k === 'Backspace'){ prev(); e.preventDefault(); return; }
+  if (k === 'Home'){ go(0); e.preventDefault(); return; }
+  if (k === 'End'){ go(N - 1); e.preventDefault(); return; }
+  if (/^[0-9]$/.test(k)){
+    numBuf += k; toast('Go to slide ' + numBuf + ' — press Enter');
+    clearTimeout(numT); numT = setTimeout(function(){ numBuf = ''; }, 2500); return;
+  }
+  switch (k.toLowerCase()){
+    case 'f': toggleFullscreen(); break;
+    case 'p': openPresenter(); break;
+    case 'm': case 'g': toggleOverlay('menu'); break;
+    case 'd': setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'); break;
+    case 'b': case '.': $('#black').classList.toggle('on'); break;
+    case '?': case 'h': toggleOverlay('help'); break;
+  }
+}
+document.addEventListener('keydown', onKey);
+
+/* buttons, mouse, touch */
+$('#navBtns').addEventListener('click', function(e){
+  var b = e.target.closest('button'); if (!b) return;
+  var a = b.dataset.act; if (a === 'prev') prev(); else if (a === 'next') next(); else toggleOverlay('menu');
+});
+document.addEventListener('click', function(e){
+  var b = e.target.closest && e.target.closest('button');
+  if (b) setTimeout(function(){ b.blur(); }, 0);
+});
+var mouseT = null;
+addEventListener('mousemove', function(){
+  document.body.classList.add('mouse'); clearTimeout(mouseT);
+  mouseT = setTimeout(function(){ document.body.classList.remove('mouse'); }, 2500);
+});
+var touchX = null;
+stage.addEventListener('touchstart', function(e){ touchX = e.touches[0].clientX; }, {passive: true});
+stage.addEventListener('touchend', function(e){
+  if (touchX === null) return;
+  var dx = e.changedTouches[0].clientX - touchX; touchX = null;
+  if (Math.abs(dx) > 60){ if (dx < 0) next(); else prev(); }
+});
+$('#black').addEventListener('click', function(){ $('#black').classList.remove('on'); });
+
+/* ---------------------------------------------------------
+   Widgets: break countdown + colour picker
+   --------------------------------------------------------- */
+$$('.countdown').forEach(function(c){
+  var total = (+c.dataset.min || 5) * 60, left = total, timer = null;
+  var disp = $('.cd-time', c), start = $('.cd-start', c);
+  function paint(){ disp.textContent = Math.floor(left / 60) + ':' + String(left % 60).padStart(2, '0'); c.classList.toggle('done', left === 0); }
+  function stop(){ clearInterval(timer); timer = null; start.textContent = left === 0 ? 'Start' : 'Resume'; }
+  start.addEventListener('click', function(){
+    if (timer){ stop(); return; }
+    if (left === 0) left = total;
+    timer = setInterval(function(){ if (left > 0){ left--; paint(); } if (left === 0){ stop(); toast('Break is over: back to CSS! 🎨'); } }, 1000);
+    start.textContent = 'Pause'; paint();
+  });
+  $('.cd-add', c).addEventListener('click', function(){ left += 60; paint(); });
+  $('.cd-reset', c).addEventListener('click', function(){ left = total; stop(); start.textContent = 'Start'; paint(); });
+  paint();
+});
+(function(){
+  var cp = $('#cp'); if (!cp) return;
+  function upd(){
+    var v = cp.value, r = parseInt(v.slice(1, 3), 16), g = parseInt(v.slice(3, 5), 16), b = parseInt(v.slice(5, 7), 16);
+    $('#cp-hex').textContent = v;
+    $('#cp-rgb').textContent = 'rgb(' + r + ', ' + g + ', ' + b + ')';
+    var sm = $('#cp-sample'); sm.style.color = v; sm.style.borderColor = v;
+  }
+  cp.addEventListener('input', upd); upd();
+})();
+
+/* =========================================================
+   Lesson 02: the portfolio page, "Break it" buttons, widgets
+   ========================================================= */
+
+/* ---------- the portfolio page, built up section by section ---------- */
+function pfPart(n){ var s = document.getElementById('pf-' + n); return s ? dedent(s.textContent) : ''; }
+function buildPf(stage){
+  var order = ['header', 'hero', 'shells', 'about', 'skills', 'projects', 'education', 'contact', 'footer'];
+  var secs = [['about', 'About Me'], ['skills', 'My Skills'], ['projects', 'My Projects'], ['education', 'Education'], ['contact', 'Contact Me']];
+  var k = order.indexOf(stage); if (k < 0) k = order.length - 1;
+  var h = pfPart('header');
+  if (k >= 1) h += '\n\n' + pfPart('hero');
+  if (k >= 2){
+    h += '\n\n' + pfPart('page-open');
+    secs.forEach(function(sx){
+      h += '\n\n' + (k >= order.indexOf(sx[0]) ? pfPart(sx[0]) : '<div id="' + sx[0] + '" class="section"><h2>' + sx[1] + '</h2></div>');
+    });
+    h += '\n\n</div>';
+  }
+  if (k >= 8) h += '\n\n' + pfPart('footer');
+  return h;
+}
+function jumpTo(d, href){
+  var t = href.length > 1 ? d.getElementById(href.slice(1)) : null, w = d.defaultView;
+  if (t && w) w.scrollTo(0, t.getBoundingClientRect().top + w.scrollY);  /* follows the page's scroll-behavior */
+}
+
+/* ---------- "Break it" and "Try" buttons ---------- */
+function unesc(s){ return String(s || '').replace(/\\n/g, '\n'); }
+function liveOf(el){ var s = el.closest('.slide'); return s ? $('.live', s) : null; }
+function propRe(prop){ return new RegExp('(' + prop + ':\\s*)([^;]*)(;)'); }
+function markSeg(seg, val){ $$('.try', seg).forEach(function(b){ b.classList.toggle('on', b.dataset.val === val); }); }
+function applyTry(b, quiet){
+  var box = liveOf(b); if (!box || !box._ed) return false;
+  var v = box._ed.getValue(), nv = null, on = !b.classList.contains('on');
+  if (b.dataset.add != null){
+    var add = '\n' + unesc(b.dataset.add);
+    if (on) nv = v + add;
+    else if (v.indexOf(add) >= 0) nv = v.replace(add, '');
+  } else {
+    var f = unesc(b.dataset.from), t = unesc(b.dataset.to), a = on ? f : t;
+    if (v.indexOf(a) >= 0) nv = v.replace(a, on ? t : f);
+  }
+  if (nv === null){
+    b.classList.remove('on');
+    if (!quiet) toast('This code was changed by hand. Press ↺ Reset first.');
+    return false;
+  }
+  box._ed.setValue(nv);
+  b.classList.toggle('on', on);
+  return true;
+}
+function setProp(box, prop, val){
+  var re = propRe(prop), v = box._ed.getValue();
+  if (!re.test(v)) return false;
+  box._ed.setValue(v.replace(re, function(all, p1, p2, p3){ return p1 + val + p3; }));
+  return true;
+}
+function applySeg(b){
+  var seg = b.closest('.seg'), prop = seg.dataset.prop, box = liveOf(b);
+  if (!box || !box._ed) return;
+  var m = propRe(prop).exec(box._ed.getValue());
+  if (!m){ toast('No ' + prop + ' line found. Press ↺ Reset first.'); return; }
+  if (!box._grp) box._grp = {};
+  if (!(prop in box._grp)) box._grp[prop] = m[2].trim();
+  setProp(box, prop, b.dataset.val);
+  markSeg(seg, b.dataset.val);
+}
+/* leaving a slide puts its code back, so later code-along steps never inherit a broken step */
+function restoreTries(s){
+  $$('.try.on', s).forEach(function(b){ if (!b.closest('.seg')) applyTry(b, true); });
+  $$('.live', s).forEach(function(box){
+    if (!box._grp || !box._ed) return;
+    Object.keys(box._grp).forEach(function(prop){
+      setProp(box, prop, box._grp[prop]);
+      $$('.seg[data-prop="' + prop + '"]', s).forEach(function(seg){ markSeg(seg, box._grp[prop]); });
+    });
+    box._grp = null;
+  });
+}
+$$('.try').forEach(function(b){
+  b.addEventListener('click', function(){ if (b.closest('.seg')) applySeg(b); else applyTry(b); });
+});
+$$('.live').forEach(function(box){
+  var s = box.closest('.slide'); if (!s) return;
+  var segs = $$('.seg', s);
+  function initSegs(){
+    segs.forEach(function(seg){
+      var m = propRe(seg.dataset.prop).exec(box._ed ? box._ed.getValue() : '');
+      markSeg(seg, m ? m[2].trim() : '');
+    });
+  }
+  initSegs();
+  box._resetTries = function(){
+    $$('.try', s).forEach(function(b){ if (!b.closest('.seg')) b.classList.remove('on'); });
+    box._grp = null; initSegs();
+  };
+});
+
+/* ---------- preview panes for the widgets ---------- */
+function pageDoc(html, css){
+  return '<!DOCTYPE html><html><head><meta charset="utf-8"><style>\n' + css + '\n</style></head><body>' + fixImgs(html) + '</body></html>';
+}
+function previewPane(z, url, title){
+  var out = mk('div', 'live-out'), bar = mk('div', 'bbar'), fw = mk('div', 'fwrap'), ifr = mk('iframe');
+  bar.innerHTML = '<span class="dots"><i></i><i></i><i></i></span><span class="btab">' + esc(title || url) + '</span><span class="url">' + esc(url) + '</span>';
+  ifr.title = 'Live preview';
+  ifr.style.width = (100 / z) + '%'; ifr.style.height = (100 / z) + '%'; ifr.style.transform = 'scale(' + z + ')';
+  fw.appendChild(ifr); out.appendChild(bar); out.appendChild(fw);
+  ifr.addEventListener('load', function(){
+    var d; try { d = ifr.contentDocument; } catch (e) { return; }
+    if (!d) return;
+    d.addEventListener('keydown', onKey);
+    d.addEventListener('click', function(e){
+      var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a) return;
+      e.preventDefault();
+      var h = a.getAttribute('href');
+      if (h.charAt(0) === '#') jumpTo(d, h); else toast('Link → ' + h);
+    });
+    d.addEventListener('submit', function(e){ e.preventDefault(); });
+  });
+  return { el: out, ifr: ifr };
+}
+
+/* ---------- today's project: build the page up one CSS step at a time ---------- */
+var BU_NAMES = ['Plain HTML, no CSS', 'Page basics', 'Header & menu', 'Hero', 'Section boxes', 'About', 'Skills', 'Project cards', 'Education table', 'Contact form', 'Footer'];
+var SHOW_BOXES = '\n* { outline: 2px dashed rgba(214, 40, 40, .65) !important; outline-offset: -2px; }';
+function pfCss(n){
+  return $$('.live[data-chain="pf"]').filter(function(b){ return +b.dataset.pfstep <= n; })
+    .map(function(b){ return b._orig ? b._orig.css : ''; }).join('\n');
+}
+$$('.bu').forEach(function(w){
+  var r = $('.bu-range', w), stepEl = $('.bu-step', w), nameEl = $('.bu-name', w), cb = $('.bu-box input', w);
+  var pv = previewPane(+(w.dataset.zoom || 0.6), 'index.html', 'Ranjit Shrestha | Portfolio');
+  $('.bu-view', w).appendChild(pv.el);
+  var page = buildPf('footer');
+  function render(){
+    var n = +r.value;
+    stepEl.textContent = 'STEP ' + n;
+    nameEl.textContent = BU_NAMES[n];
+    pv.ifr.srcdoc = pageDoc(page, pfCss(n) + (cb.checked ? SHOW_BOXES : ''));
+  }
+  r.addEventListener('input', render);
+  cb.addEventListener('change', render);
+  w._render = render;
+  render();
+});
+
+/* ---------- box model playground: teddy's gift box ---------- */
+$$('.bmp').forEach(function(w){
+  var ins = $$('input[type="range"]', w), gm = $('.pg-m', w), gb = $('.pg-b', w), code = $('.bmp-code', w), sum = $('.bmp-sum', w);
+  function upd(){
+    var v = {};
+    ins.forEach(function(i){ v[i.dataset.k] = +i.value; var o = $('output', i.parentNode); if (o) o.textContent = i.value + 'px'; });
+    gb.style.setProperty('--pd', v.p + 'px');
+    gb.style.setProperty('--bw', v.b + 'px');
+    gm.style.setProperty('--m', v.m + 'px');
+    code.innerHTML = hlString('.box {\n    padding: ' + v.p + 'px;\n    border: ' + v.b + 'px solid brown;\n    margin: ' + v.m + 'px;\n}', 'css');
+    sum.innerHTML = 'From teddy to the next box:<br><b>' + v.p + ' + ' + v.b + ' + ' + v.m + ' = ' + (v.p + v.b + v.m) + 'px</b>';
+  }
+  ins.forEach(function(i){ i.addEventListener('input', upd); });
+  upd();
+});
+
+/* ---------- "boxes everywhere": the finished page; its boxes appear on a slide step ---------- */
+$$('.pfbox').forEach(function(w){
+  var pv = previewPane(+(w.dataset.zoom || 0.6), 'index.html', 'Ranjit Shrestha | Portfolio');
+  w.appendChild(pv.el);
+  var page = buildPf('footer'), at = +(w.dataset.boxStep || 1), slide = w.closest('.slide'), shown = null;
+  function render(n){
+    var on = n >= at;
+    if (on === shown) return;
+    shown = on;
+    pv.ifr.srcdoc = pageDoc(page, pfCss(10) + (on ? SHOW_BOXES : ''));
+  }
+  if (slide) slide.addEventListener('step', function(e){ render(e.detail); });
+  render(0);
+});
+
+/* ---------- shorthand decoder ---------- */
+var SHD_RULES = {
+  1: '<b>1 value</b> → all four sides',
+  2: '<b>2 values</b> → top &amp; bottom, then left &amp; right',
+  3: '<b>3 values</b> → top, then left &amp; right, then bottom',
+  4: '<b>4 values</b> → clockwise from the top: top, right, bottom, left'
+};
+$$('.shd').forEach(function(w){
+  var inp = $('.shd-in input', w), box = $('.shd-box', w), rule = $('.shd-rule', w);
+  function upd(){
+    var toks = inp.value.trim().split(/\s+/).filter(Boolean);
+    var ok = toks.length >= 1 && toks.length <= 4 && toks.every(function(t){ return /^(0|\d+(\.\d+)?px)$/.test(t); });
+    w.classList.toggle('bad', !ok);
+    if (!ok){ rule.innerHTML = 'Write 1 to 4 sizes, like <code>10px 20px</code>'; return; }
+    var n = toks.map(parseFloat), s;
+    if (n.length === 1) s = [n[0], n[0], n[0], n[0]];
+    else if (n.length === 2) s = [n[0], n[1], n[0], n[1]];
+    else if (n.length === 3) s = [n[0], n[1], n[2], n[1]];
+    else s = n;
+    box.style.padding = s.map(function(x){ return Math.min(x * 2, 120) + 'px'; }).join(' ');
+    ['t', 'r', 'b', 'l'].forEach(function(k, i){
+      $('.shd-' + k, w).textContent = s[i] + 'px';
+      var o = $('.shd-o[data-s="' + k + '"]', w); if (o) o.textContent = s[i] + 'px';
+    });
+    rule.innerHTML = SHD_RULES[n.length];
+  }
+  inp.addEventListener('input', upd);
+  $$('.chipb', w).forEach(function(c){ c.addEventListener('click', function(){ inp.value = c.dataset.v; upd(); }); });
+  w._upd = upd;
+  upd();
+});
+
+/* ---------- selector tester ---------- */
+$$('.selt').forEach(function(w){
+  var inp = $('.selt-in input', w), res = $('.selt-res', w);
+  var hs = $('script[type="text/x-html"]', w), cs = $('script[type="text/x-css"]', w);
+  var html = hs ? dedent(hs.textContent) : '', css = cs ? dedent(cs.textContent) : '';
+  var pv = previewPane(+(w.dataset.zoom || 1), 'index.html', 'Selector test');
+  $('.selt-view', w).appendChild(pv.el);
+  function mark(){
+    var d; try { d = pv.ifr.contentDocument; } catch (e) { return; }
+    if (!d || !d.body) return;
+    $$('.sel-hit', d).forEach(function(e){ e.classList.remove('sel-hit'); });
+    var sel = inp.value.trim(), list;
+    if (!sel){ res.textContent = 'Type a selector'; return; }
+    try { list = Array.prototype.slice.call(d.body.querySelectorAll(sel)); }
+    catch (e) { w.classList.add('bad'); res.textContent = 'Not a valid selector yet…'; return; }
+    w.classList.remove('bad');
+    list.forEach(function(e){ e.classList.add('sel-hit'); });
+    res.textContent = list.length === 1 ? '1 element matches' : list.length + ' elements match';
+  }
+  pv.ifr.addEventListener('load', mark);
+  pv.ifr.srcdoc = pageDoc(html, css + '\n.sel-hit { outline: 4px solid #ffd43b !important; outline-offset: 2px; background-color: #ffd43b !important; color: #1c1a27 !important; }');
+  inp.addEventListener('input', mark);
+  $$('.chipb', w).forEach(function(c){ c.addEventListener('click', function(){ inp.value = c.dataset.v; mark(); }); });
+  w._mark = mark;
+});
+
+/* ---------------------------------------------------------
+   Start
+   --------------------------------------------------------- */
+fit();
+function fromHash(){ var m = location.hash.match(/^#(\d+)/); return m ? +m[1] - 1 : 0; }
+addEventListener('hashchange', function(){ var i = fromHash(); if (i !== cur) go(i); });
+go(fromHash());
+})();
+</script>
+</body>
+</html>

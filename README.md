@@ -58,6 +58,7 @@ The Student Profile shows a photo from `images/self.JPG`. To see it, make an `im
 | Lesson | Slides | PDF |
 | --- | --- | --- |
 | 01 · HTML Recap → Intro to CSS | [`index.html`](slides/01-intro-to-css/index.html) | [`intro-to-css.pdf`](slides/01-intro-to-css/intro-to-css.pdf) |
+| 02 · Box Model → Build Your Portfolio | [`index.html`](slides/02-box-model/index.html) | – |
 
 - **PDF:** click it on GitHub to read it in your browser, or download it to read and print offline.
 - **HTML slides:** download the repo and open `index.html` in your browser. They work offline, and you can edit the code on the slides and see the result live.
