@@ -34,7 +34,8 @@ Images: `ravi.jpg` is used by `profile.html` and `contact/contact.html`. `images
 
 | File | Topic |
 | --- | --- |
-| [`index.html`](css-training/index.html) + [`css/style.css`](css-training/css/style.css) | Linking an external stylesheet; element (`h1`), id (`#second-p`) and class (`.orange-p`) selectors; `color`, `font-size`, `font-style` |
+| [`index.html`](css-training/index.html) + [`css/style.css`](css-training/css/style.css) | Box model: a `.box` with `width`, `padding` and `border`; the `*` selector resets `margin` and `padding` and sets `box-sizing: border-box` on every element |
+| [`ranjit-portfolio/index.html`](css-training/ranjit-portfolio/index.html) + [`ranjit-portfolio/css/style.css`](css-training/ranjit-portfolio/css/style.css) | **Project: portfolio website, part 1 (the header).** Name and menu links on a blue background: `.header`, `.logo`, `.nav-item`, `text-decoration: none`, and a `:hover` effect with `background-color` and `border-radius` |
 
 ## Assignments
 

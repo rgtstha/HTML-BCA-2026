@@ -1,19 +1,12 @@
-h1 {
-    color: blue;
+* {
+    box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
 }
 
+.box {
+    border: 10px solid red;
+    padding: 20px;
+    width: 200px;
 
-h2 {
-    color: red;
-}
-
-
-#second-p {
-    color: brown;
-}
-
-.orange-p {
-    color: yellowgreen;
-    font-size: 14px;
-    font-style: italic;
 }
