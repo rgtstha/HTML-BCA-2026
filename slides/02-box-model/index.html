@@ -266,10 +266,6 @@ table.tt{width:100%;border-collapse:separate;border-spacing:0;font-size:21px;bac
 .pick-out{font:22px/1.6 var(--mono)}
 .pick-sample{font-size:30px;font-weight:800;padding:10px 18px;border-radius:12px;border:2px dashed var(--line)}
 
-/* border style samples */
-.bs{display:flex;gap:12px;flex-wrap:wrap}
-.bs div{font:16px var(--mono);padding:10px 14px;border-radius:4px;background:var(--surface)}
-
 /* box model teaser */
 .boxm{background:repeating-linear-gradient(45deg,#ffe8cc,#ffe8cc 8px,#fff4e6 8px,#fff4e6 16px);padding:22px;border-radius:10px;position:relative;color:#1c1a27}
 .boxm .b{border:4px solid #e8590c;background:#d3f9d8;padding:20px;position:relative}
@@ -1432,9 +1428,9 @@ a { padding: 2px 4px; border-radius: 4px; }
   <div class="body">
     <div class="opts">
       <div class="opt"><span class="letter">A</span>Links can never have a margin</div>
-      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>A link is <b>inline</b>: add <code>display: inline-block</code></div>
+      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span><span>A link is <b>inline</b>: add <code>display: inline-block</code></span></div>
       <div class="opt"><span class="letter">C</span>30px is too small to see</div>
-      <div class="opt"><span class="letter">D</span>It needs <code>text-align: center</code></div>
+      <div class="opt"><span class="letter">D</span><span>It needs <code>text-align: center</code></span></div>
     </div>
     <div class="explain frag" data-step="1"><span class="ok-badge">B</span><span>Inline things sit in the line like words, so they ignore top margin. <code>inline-block</code> fixes it.</span></div>
   </div>
@@ -1454,7 +1450,7 @@ a { padding: 2px 4px; border-radius: 4px; }
       <div class="col grow" style="gap:14px">
         <div class="opts">
           <div class="opt"><span class="letter">A</span>Yes, it is inside #box</div>
-          <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>No, it is inside the <code>p</code></div>
+          <div class="opt correct frag keep" data-step="1"><span class="letter">B</span><span>No, it is inside the <code>p</code></span></div>
           <div class="opt"><span class="letter">C</span>Only on hover</div>
           <div class="opt"><span class="letter">D</span>Only with a class</div>
         </div>
@@ -2348,8 +2344,8 @@ button:hover {
   <div class="body">
     <div class="opts">
       <div class="opt"><span class="letter">A</span>Both buttons</div>
-      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>A <code>.button-outline</code> <b>inside</b> a <code>.button</code></div>
-      <div class="opt"><span class="letter">C</span>Only <code>.button</code></div>
+      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span><span>A <code>.button-outline</code> <b>inside</b> a <code>.button</code></span></div>
+      <div class="opt"><span class="letter">C</span><span>Only <code>.button</code></span></div>
       <div class="opt"><span class="letter">D</span>Every link on the page</div>
     </div>
     <div class="explain frag" data-step="1"><span class="ok-badge">B</span><span>A <b>space</b> means "inside". A <b>comma</b> means "and". On our page this selects nothing!</span></div>
@@ -2361,10 +2357,10 @@ button:hover {
   <h2><code>h3 { color: orange; }</code> and <code>.card h3 { color: blue; }</code><br>What colour is a card's title?</h2>
   <div class="body">
     <div class="opts">
-      <div class="opt"><span class="letter">A</span>Orange: <code>h3</code> is written first</div>
-      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span>Blue: <code>.card h3</code> is more specific</div>
+      <div class="opt"><span class="letter">A</span><span>Orange: <code>h3</code> is written first</span></div>
+      <div class="opt correct frag keep" data-step="1"><span class="letter">B</span><span>Blue: <code>.card h3</code> is more specific</span></div>
       <div class="opt"><span class="letter">C</span>Black: the colours cancel out</div>
-      <div class="opt"><span class="letter">D</span>Orange: <code>h3</code> is shorter</div>
+      <div class="opt"><span class="letter">D</span><span>Orange: <code>h3</code> is shorter</span></div>
     </div>
     <div class="explain frag" data-step="1"><span class="ok-badge">B</span><span>A class + an element beats an element alone. The About <code>h3</code> stays orange.</span></div>
   </div>
