@@ -4,6 +4,10 @@
     padding: 0px;
 }
 
+a {
+    text-decoration: none;
+}
+
 .header {
     background-color: blue;
     padding: 40px;
@@ -32,4 +36,45 @@
     background-color: red;
     border-radius: 12px;
 
+}
+
+.main {
+    text-align: center;
+    padding: 40px;
+}
+
+.main>img {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+}
+
+.greeting {
+    color: orangered;
+    font-weight: 600;
+}
+
+.subtitle {
+    font-style: italic;
+    color: gray;
+}
+
+
+.intro {
+    margin-bottom: 20px;
+
+}
+
+.primary-btn {
+    background-color: orangered;
+    padding: 6px 12px;
+    border-radius: 16px;
+    color: white;
+}
+
+.secondary-btn {
+    padding: 6px 12px;
+    border-radius: 16px;
+    border: 2px solid orangered;
+    color: orangered;
 }
